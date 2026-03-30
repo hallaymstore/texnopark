@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qarshi Yoshlar Texnoparki</title>
+  <meta
+    name="description"
+    content="Qarshi Yoshlar Texnoparki uchun premium light dizayndagi rasmiy platforma."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a href="#home" class="brand">
+        <div class="brand-mark">QY</div>
+        <div>
+          <strong id="brandName">Qarshi Yoshlar Texnoparki</strong>
+          <span id="brandTagline">Innovatsiya, ta'lim va startaplar markazi</span>
+        </div>
+      </a>
+
+      <nav class="nav-links desktop-nav">
+        <a href="#about">Markaz haqida</a>
+        <a href="#directions">Yo'nalishlar</a>
+        <a href="#projects">Loyihalar</a>
+        <a href="#meeting">Uchrashuv</a>
+        <a href="#application">Ariza</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="nav-cta" href="#application">Boshlash</a>
+        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menyuni ochish">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#about">Markaz haqida</a>
+      <a href="#directions">Yo'nalishlar</a>
+      <a href="#projects">Loyihalar</a>
+      <a href="#meeting">Uchrashuv</a>
+      <a href="#application">Ariza</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero section" id="home">
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <div class="eyebrow" id="heroEyebrow">Qashqadaryo yoshlariga yangi avlod texnoparki</div>
+          <h1 id="heroTitle">
+            Kelajak kasblari va startaplar uchun premium raqamli makon
+          </h1>
+          <p class="hero-text" id="heroDescription">
+            Platforma ma'lumotlari yuklanmoqda...
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" id="heroPrimaryAction" href="#application">Ariza topshirish</a>
+            <a class="btn btn-secondary" id="heroSecondaryAction" href="#meeting">Uchrashuv belgilash</a>
+          </div>
+
+          <div class="hero-spotlights" id="heroSpotlights"></div>
+        </div>
+
+        <div class="hero-visual reveal delay-1">
+          <div class="hero-card">
+            <img id="heroImage" src="" alt="Qarshi Yoshlar Texnoparki hero rasmi" />
+            <div class="hero-card-overlay">
+              <span class="overlay-pill">Premium Control Hub</span>
+              <h2 id="heroCardTitle">Texnopark boshqaruvi va imkoniyatlari bitta platformada</h2>
+              <p id="heroCardDescription"></p>
+            </div>
+          </div>
+
+          <div class="glass-note glass-note-top">
+            <span>Smart workflow</span>
+            <strong>Ariza, uchrashuv va status oqimi</strong>
+          </div>
+          <div class="glass-note glass-note-bottom">
+            <span>Cloud-ready</span>
+            <strong>MongoDB va Cloudinary bilan ishlaydi</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-strip reveal">
+      <div class="container trust-grid" id="trustGrid"></div>
+    </section>
+
+    <section class="section about-section" id="about">
+      <div class="container split-grid">
+        <div class="section-copy reveal">
+          <div class="section-tag" id="aboutTag">Markaz haqida</div>
+          <h2 id="aboutTitle"></h2>
+          <p id="aboutDescription"></p>
+          <div class="feature-list" id="aboutFeatures"></div>
+        </div>
+
+        <div class="about-visual reveal delay-1">
+          <div class="image-composition">
+            <img id="aboutImageA" class="image-primary" src="" alt="Texnopark faoliyati" />
+            <img id="aboutImageB" class="image-secondary" src="" alt="Texnopark laboratoriyasi" />
+            <div class="info-badge">
+              <strong id="aboutBadgeTitle"></strong>
+              <span id="aboutBadgeText"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-soft" id="directions">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-tag" id="directionsTag">Asosiy yo'nalishlar</div>
+          <h2 id="directionsTitle"></h2>
+          <p id="directionsDescription"></p>
+        </div>
+
+        <div class="cards-grid" id="directionsGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="projects">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-tag" id="projectsTag">Tanlangan loyihalar</div>
+          <h2 id="projectsTitle"></h2>
+          <p id="projectsDescription"></p>
+        </div>
+
+        <div class="project-grid" id="projectsGrid"></div>
+      </div>
+    </section>
+
+    <section class="section metrics-section">
+      <div class="container metrics-grid" id="metricsGrid"></div>
+    </section>
+
+    <section class="section section-soft" id="news">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="section-tag" id="newsTag">Yangiliklar</div>
+          <h2 id="newsTitle"></h2>
+          <p id="newsDescription"></p>
+        </div>
+
+        <div class="news-grid" id="newsGrid"></div>
+      </div>
+    </section>
+
+    <section class="section interaction-section" id="meeting">
+      <div class="container interaction-grid">
+        <article class="interaction-card reveal">
+          <div class="section-tag" id="meetingTag">Uchrashuv belgilash</div>
+          <h2 id="meetingTitle"></h2>
+          <p id="meetingDescription"></p>
+          <p class="soft-caption" id="meetingNote"></p>
+
+          <form id="meetingForm" class="stack-form">
+            <input type="text" name="fullName" placeholder="F.I.Sh." required />
+            <input type="text" name="phone" placeholder="Telefon raqam" required />
+            <input type="email" name="email" placeholder="Email manzil" />
+            <input type="text" name="organization" placeholder="Tashkilot yoki loyiha nomi" />
+            <select name="meetingType" id="meetingTypeSelect" required></select>
+            <input type="date" name="preferredDate" id="meetingDateInput" required />
+            <textarea name="note" rows="4" placeholder="Qisqa izoh yoki uchrashuv maqsadi"></textarea>
+            <button class="btn btn-primary full-width" type="submit">Uchrashuv yuborish</button>
+            <p class="form-message" id="meetingMessage"></p>
+          </form>
+        </article>
+
+        <article class="interaction-card reveal delay-1" id="application">
+          <div class="section-tag" id="applicationTag">Ariza topshirish</div>
+          <h2 id="applicationTitle"></h2>
+          <p id="applicationDescription"></p>
+          <div class="device-box">
+            <div>
+              <span>Joriy device ID</span>
+              <strong id="deviceIdLabel">Yuklanmoqda...</strong>
+            </div>
+            <button class="btn btn-secondary compact" id="copyDeviceIdBtn" type="button">Nusxa olish</button>
+          </div>
+          <p class="soft-caption" id="applicationHelper"></p>
+
+          <form id="applicationForm" class="stack-form">
+            <input type="text" name="fullName" placeholder="F.I.Sh." required />
+            <input type="text" name="phone" placeholder="Telefon raqam" required />
+            <input type="email" name="email" placeholder="Email manzil" />
+            <select name="selectedProgram" id="applicationProgramSelect" required></select>
+            <input type="url" name="portfolioLink" placeholder="Portfolio yoki loyiha havolasi (ixtiyoriy)" />
+            <textarea name="message" rows="5" placeholder="O'zingiz yoki loyihangiz haqida yozing" required></textarea>
+            <button class="btn btn-primary full-width" type="submit">Ariza yuborish</button>
+            <p class="form-message" id="applicationMessage"></p>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <section class="section status-section" id="status">
+      <div class="container status-grid">
+        <div class="section-copy reveal">
+          <div class="section-tag" id="statusTag">Ariza natijasi</div>
+          <h2 id="statusTitle"></h2>
+          <p id="statusDescription"></p>
+          <p class="soft-caption" id="statusHelper"></p>
+        </div>
+
+        <div class="status-card reveal delay-1">
+          <form id="statusForm" class="status-form">
+            <label for="statusDeviceIdInput">Device ID</label>
+            <div class="status-input-row">
+              <input type="text" id="statusDeviceIdInput" placeholder="Device ID kiriting" required />
+              <button class="btn btn-primary compact" type="submit">Tekshirish</button>
+            </div>
+          </form>
+
+          <div class="status-list" id="statusList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact-section">
+      <div class="container contact-shell reveal">
+        <div>
+          <div class="section-tag">Bog'lanish</div>
+          <h2 id="contactTitle"></h2>
+          <p id="contactDescription"></p>
+        </div>
+
+        <div class="contact-grid">
+          <a class="contact-item" id="contactAddressLink" href="#" target="_blank" rel="noreferrer">
+            <span>Manzil</span>
+            <strong id="contactAddress"></strong>
+          </a>
+          <a class="contact-item" id="contactPhoneLink" href="#">
+            <span>Telefon</span>
+            <strong id="contactPhone"></strong>
+          </a>
+          <a class="contact-item" id="contactEmailLink" href="#">
+            <span>Email</span>
+            <strong id="contactEmail"></strong>
+          </a>
+          <div class="contact-item">
+            <span>Ish vaqti</span>
+            <strong id="contactWorkingHours"></strong>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <div>
+        <strong id="footerName">Qarshi Yoshlar Texnoparki</strong>
+        <p id="footerText">Premium light dizayndagi rasmiy platforma.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#directions">Yo'nalishlar</a>
+        <a href="#meeting">Uchrashuv</a>
+        <a href="#application">Ariza</a>
+        <a href="#status">Natija</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

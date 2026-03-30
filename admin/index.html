@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QYT Control Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="admin-bg admin-bg-a"></div>
+  <div class="admin-bg admin-bg-b"></div>
+
+  <main class="admin-shell">
+    <section class="auth-view" id="authView">
+      <article class="auth-card">
+        <span class="eyebrow">Hidden Control Room</span>
+        <h1>Kontent, ariza va uchrashuvlarni boshqarish</h1>
+        <p>
+          Bu sahifa public menyuda ko'rinmaydi. Kirish uchun `.env` dagi yashirin slug va admin login ishlatiladi.
+        </p>
+
+        <form id="loginForm" class="stack-form">
+          <input type="text" name="username" placeholder="Admin username" required />
+          <input type="password" name="password" placeholder="Admin password" required />
+          <button class="primary-btn" type="submit">Kirish</button>
+          <p class="message" id="loginMessage"></p>
+        </form>
+      </article>
+    </section>
+
+    <section class="dashboard-view hidden" id="dashboardView">
+      <header class="dashboard-topbar">
+        <div>
+          <span class="eyebrow">Control Dashboard</span>
+          <h2 id="dashboardWelcome">Admin panel</h2>
+          <p>Public saytda ko'rinmaydigan boshqaruv qismi. Kontentni saqlashdan oldin JSON bloklarini tekshirib chiqing.</p>
+        </div>
+        <div class="topbar-actions">
+          <a class="ghost-btn" href="/" target="_blank" rel="noreferrer">Saytni ochish</a>
+          <button class="ghost-btn" id="refreshBtn" type="button">Yangilash</button>
+          <button class="primary-btn" id="logoutBtn" type="button">Chiqish</button>
+        </div>
+      </header>
+
+      <section class="summary-grid" id="summaryGrid">
+        <article class="summary-card">
+          <span>Jami arizalar</span>
+          <strong id="summaryApplications">0</strong>
+        </article>
+        <article class="summary-card">
+          <span>Yangi uchrashuvlar</span>
+          <strong id="summaryAppointments">0</strong>
+        </article>
+        <article class="summary-card">
+          <span>Tasdiqlangan arizalar</span>
+          <strong id="summaryApproved">0</strong>
+        </article>
+      </section>
+
+      <div class="dashboard-grid">
+        <article class="panel panel-wide">
+          <div class="panel-head">
+            <div>
+              <h3>Sayt kontenti</h3>
+              <p>Har bir bo'lim saqlanganda public sahifada darhol yangilanadi.</p>
+            </div>
+            <button class="primary-btn" id="saveContentBtn" type="button">Saqlash</button>
+          </div>
+
+          <form id="contentForm" class="content-form">
+            <div class="form-section">
+              <h4>Brend va hero</h4>
+              <div class="field-grid">
+                <label><span>Sayt nomi</span><input name="general.organizationName" type="text" /></label>
+                <label><span>Qisqa nom</span><input name="general.organizationShortName" type="text" /></label>
+                <label class="full"><span>Tagline</span><input name="general.tagline" type="text" /></label>
+                <label class="full"><span>Meta description</span><textarea name="general.metaDescription" rows="3"></textarea></label>
+                <label><span>Hero eyebrow</span><input name="hero.eyebrow" type="text" /></label>
+                <label><span>Hero image URL</span><input name="hero.image" type="url" /></label>
+                <label class="full"><span>Hero title</span><textarea name="hero.title" rows="2"></textarea></label>
+                <label class="full"><span>Hero highlight</span><input name="hero.highlight" type="text" /></label>
+                <label class="full"><span>Hero description</span><textarea name="hero.description" rows="4"></textarea></label>
+                <label><span>Primary button text</span><input name="hero.primaryActionLabel" type="text" /></label>
+                <label><span>Primary button link</span><input name="hero.primaryActionLink" type="text" /></label>
+                <label><span>Secondary button text</span><input name="hero.secondaryActionLabel" type="text" /></label>
+                <label><span>Secondary button link</span><input name="hero.secondaryActionLink" type="text" /></label>
+                <label class="full"><span>Hero card title</span><input name="hero.cardTitle" type="text" /></label>
+                <label class="full"><span>Hero card description</span><textarea name="hero.cardDescription" rows="3"></textarea></label>
+                <label class="full"><span>Hero spotlights JSON</span><textarea name="heroSpotlights" rows="9"></textarea></label>
+                <label class="full"><span>Trust items JSON</span><textarea name="trustItems" rows="7"></textarea></label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4>About</h4>
+              <div class="field-grid">
+                <label><span>About tag</span><input name="about.tag" type="text" /></label>
+                <label><span>About image A</span><input name="about.imageA" type="url" /></label>
+                <label class="full"><span>About title</span><textarea name="about.title" rows="3"></textarea></label>
+                <label class="full"><span>About description</span><textarea name="about.description" rows="4"></textarea></label>
+                <label><span>About image B</span><input name="about.imageB" type="url" /></label>
+                <label><span>Badge title</span><input name="about.badgeTitle" type="text" /></label>
+                <label class="full"><span>Badge text</span><textarea name="about.badgeText" rows="3"></textarea></label>
+                <label class="full"><span>About features JSON</span><textarea name="about.features" rows="8"></textarea></label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4>Yo'nalishlar va loyihalar</h4>
+              <div class="field-grid">
+                <label><span>Directions tag</span><input name="directions.tag" type="text" /></label>
+                <label><span>Projects tag</span><input name="projects.tag" type="text" /></label>
+                <label class="full"><span>Directions title</span><textarea name="directions.title" rows="2"></textarea></label>
+                <label class="full"><span>Directions description</span><textarea name="directions.description" rows="3"></textarea></label>
+                <label class="full"><span>Directions items JSON</span><textarea name="directions.items" rows="12"></textarea></label>
+                <label class="full"><span>Projects title</span><textarea name="projects.title" rows="2"></textarea></label>
+                <label class="full"><span>Projects description</span><textarea name="projects.description" rows="3"></textarea></label>
+                <label class="full"><span>Projects items JSON</span><textarea name="projects.items" rows="14"></textarea></label>
+                <label class="full"><span>Metrics JSON</span><textarea name="metrics" rows="8"></textarea></label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4>Yangiliklar va foydalanuvchi oqimlari</h4>
+              <div class="field-grid">
+                <label><span>News tag</span><input name="news.tag" type="text" /></label>
+                <label><span>Meeting tag</span><input name="appointmentSection.tag" type="text" /></label>
+                <label class="full"><span>News title</span><textarea name="news.title" rows="2"></textarea></label>
+                <label class="full"><span>News description</span><textarea name="news.description" rows="3"></textarea></label>
+                <label class="full"><span>News items JSON</span><textarea name="news.items" rows="12"></textarea></label>
+                <label class="full"><span>Meeting title</span><textarea name="appointmentSection.title" rows="2"></textarea></label>
+                <label class="full"><span>Meeting description</span><textarea name="appointmentSection.description" rows="3"></textarea></label>
+                <label class="full"><span>Meeting note</span><textarea name="appointmentSection.note" rows="3"></textarea></label>
+                <label class="full"><span>Meeting types JSON</span><textarea name="appointmentSection.meetingTypes" rows="7"></textarea></label>
+                <label><span>Application tag</span><input name="applicationSection.tag" type="text" /></label>
+                <label><span>Status tag</span><input name="statusSection.tag" type="text" /></label>
+                <label class="full"><span>Application title</span><textarea name="applicationSection.title" rows="2"></textarea></label>
+                <label class="full"><span>Application description</span><textarea name="applicationSection.description" rows="3"></textarea></label>
+                <label class="full"><span>Application helper</span><textarea name="applicationSection.helperText" rows="3"></textarea></label>
+                <label class="full"><span>Application options JSON</span><textarea name="applicationSection.applicationOptions" rows="7"></textarea></label>
+                <label class="full"><span>Status title</span><textarea name="statusSection.title" rows="2"></textarea></label>
+                <label class="full"><span>Status description</span><textarea name="statusSection.description" rows="3"></textarea></label>
+                <label class="full"><span>Status helper</span><textarea name="statusSection.helperText" rows="3"></textarea></label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4>Bog'lanish</h4>
+              <div class="field-grid">
+                <label class="full"><span>Contact title</span><textarea name="contact.title" rows="2"></textarea></label>
+                <label class="full"><span>Contact description</span><textarea name="contact.description" rows="3"></textarea></label>
+                <label class="full"><span>Manzil</span><input name="contact.address" type="text" /></label>
+                <label><span>Telefon</span><input name="contact.phone" type="text" /></label>
+                <label><span>Email</span><input name="contact.email" type="email" /></label>
+                <label><span>Ish vaqti</span><input name="contact.workingHours" type="text" /></label>
+                <label class="full"><span>Map link</span><input name="contact.mapLink" type="url" /></label>
+                <label><span>Telegram</span><input name="contact.telegram" type="url" /></label>
+                <label><span>Instagram</span><input name="contact.instagram" type="url" /></label>
+              </div>
+            </div>
+
+            <p class="message" id="contentMessage"></p>
+          </form>
+        </article>
+
+        <aside class="side-stack">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Cloudinary upload</h3>
+                <p>Rasmni yuklang va olingan URL ni kerakli inputga joylang.</p>
+              </div>
+            </div>
+
+            <form id="uploadForm" class="stack-form">
+              <input id="uploadFileInput" type="file" accept="image/*" required />
+              <button class="primary-btn" type="submit">Rasm yuklash</button>
+              <textarea id="uploadResult" rows="4" placeholder="Yuklangan rasm URL shu yerda chiqadi" readonly></textarea>
+              <button class="ghost-btn" id="copyUploadUrlBtn" type="button">URL ni nusxa olish</button>
+              <p class="message" id="uploadMessage"></p>
+            </form>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>JSON eslatma</h3>
+                <p>Array bloklar uchun quyidagi formatdan foydalaning.</p>
+              </div>
+            </div>
+            <pre class="json-help">[
+  {
+    "title": "Nomi",
+    "description": "Tavsif"
+  }
+]</pre>
+          </article>
+        </aside>
+      </div>
+
+      <section class="records-section">
+        <div class="panel-head">
+          <div>
+            <h3>Arizalar</h3>
+            <p>Device ID bo'yicha yuborilgan arizalar va admin statuslari.</p>
+          </div>
+        </div>
+        <div class="record-list" id="applicationsList"></div>
+      </section>
+
+      <section class="records-section">
+        <div class="panel-head">
+          <div>
+            <h3>Uchrashuvlar</h3>
+            <p>Kelgan uchrashuv so'rovlari va ularning holati.</p>
+          </div>
+        </div>
+        <div class="record-list" id="appointmentsList"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
