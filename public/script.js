@@ -17,6 +17,9 @@ const quickSearchForm = document.getElementById("quickSearchForm");
 const quickSearchInput = document.getElementById("quickSearchInput");
 const quickSearchSuggestions = document.getElementById("quickSearchSuggestions");
 const searchFeedback = document.getElementById("searchFeedback");
+const insightTicker = document.getElementById("insightTicker");
+const programCloud = document.getElementById("programCloud");
+const heroFloatStack = document.getElementById("heroFloatStack");
 const meetingForm = document.getElementById("meetingForm");
 const applicationForm = document.getElementById("applicationForm");
 const statusForm = document.getElementById("statusForm");
@@ -102,6 +105,7 @@ function bindUi() {
 function bindWindowEffects() {
   updateScrollProgress();
   window.addEventListener("scroll", updateScrollProgress, { passive: true });
+  bindInteractiveGlow();
   initializeSectionObserver();
 }
 
@@ -140,6 +144,9 @@ function renderContent(content) {
   renderAboutPreview(content);
   renderFaq(content);
   hydrateSearch(content);
+  renderInsightTicker(content);
+  renderProgramCloud(content);
+  renderHeroFloatStack(content);
 
   setText("brandName", content.general.organizationName);
   setText("brandTagline", content.general.tagline);
@@ -287,6 +294,98 @@ function renderFaq(content) {
       });
     });
   });
+}
+
+function renderInsightTicker(content) {
+  if (!insightTicker) {
+    return;
+  }
+
+  const items = [
+    {
+      label: "Rasmiy platforma",
+      value: "Device ID va ariza tracking"
+    },
+    {
+      label: "Yo'nalishlar",
+      value: `${(content.directions.items || []).length} ta faol dastur`
+    },
+    {
+      label: "Uchrashuv",
+      value: `${(content.appointmentSection.meetingTypes || []).length} ta format`
+    },
+    {
+      label: "Media tizimi",
+      value: "Cloudinary bilan ishlaydi"
+    },
+    {
+      label: "Aloqa liniyasi",
+      value: content.contact.phone || "Doim ochiq"
+    }
+  ];
+
+  const repeated = [...items, ...items];
+
+  insightTicker.innerHTML = `
+    <div class="insight-marquee">
+      ${repeated
+        .map(
+          (item) => `
+            <div class="insight-item">
+              <strong>${escapeHtml(item.label)}</strong>
+              <span>${escapeHtml(item.value)}</span>
+            </div>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderProgramCloud(content) {
+  if (!programCloud) {
+    return;
+  }
+
+  const items = (content.directions.items || []).slice(0, 6);
+
+  programCloud.innerHTML = items
+    .map((item) => `<span class="program-chip">${escapeHtml(item.title)}</span>`)
+    .join("");
+}
+
+function renderHeroFloatStack(content) {
+  if (!heroFloatStack) {
+    return;
+  }
+
+  const primaryMetric = content.metrics && content.metrics[0] ? content.metrics[0] : null;
+  const secondaryMetric = content.metrics && content.metrics[1] ? content.metrics[1] : null;
+  const cards = [
+    {
+      label: "Main metric",
+      value: primaryMetric ? `${primaryMetric.value} ${primaryMetric.label}` : "24/7 raqamli oqim"
+    },
+    {
+      label: "Momentum",
+      value: secondaryMetric ? `${secondaryMetric.value} ${secondaryMetric.label}` : "Yoshlar va dasturlar"
+    },
+    {
+      label: "Mode",
+      value: state.theme === "dark" ? "Tungi premium UI" : "Kunduzgi premium UI"
+    }
+  ];
+
+  heroFloatStack.innerHTML = cards
+    .map(
+      (item) => `
+        <div class="float-card">
+          <span>${escapeHtml(item.label)}</span>
+          <strong>${escapeHtml(item.value)}</strong>
+        </div>
+      `
+    )
+    .join("");
 }
 
 function hydrateSearch(content) {
@@ -653,6 +752,18 @@ function initializeSectionObserver() {
   sections.forEach((section) => observer.observe(section));
 }
 
+function bindInteractiveGlow() {
+  document.querySelectorAll(".interactive-surface").forEach((surface) => {
+    surface.addEventListener("mousemove", (event) => {
+      const rect = surface.getBoundingClientRect();
+      const x = `${event.clientX - rect.left}px`;
+      const y = `${event.clientY - rect.top}px`;
+      surface.style.setProperty("--pointer-x", x);
+      surface.style.setProperty("--pointer-y", y);
+    });
+  });
+}
+
 function animateCounter(element) {
   const targetValue = Number(element.dataset.counter || 0);
   const suffix = element.dataset.suffix || "";
@@ -948,6 +1059,10 @@ function applyTheme(theme, persist) {
   document.documentElement.dataset.theme = nextTheme;
   updateThemeToggle(nextTheme);
   updateThemeMeta(nextTheme);
+
+  if (state.content) {
+    renderHeroFloatStack(state.content);
+  }
 
   if (persist) {
     writeStoredTheme(nextTheme);
