@@ -18,20 +18,26 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Qarshi Yoshlar Texnoparki" />
   <meta property="og:site_name" content="Qarshi Yoshlar Texnoparki" />
-  <meta property="og:description" content="Qarshi Yoshlar Texnoparki uchun rasmiy platforma: dasturlar, uchrashuvlar, arizalar va device ID orqali natijani kuzatish imkoniyati." />
+  <meta
+    property="og:description"
+    content="Qarshi Yoshlar Texnoparki uchun rasmiy platforma: dasturlar, uchrashuvlar, arizalar va device ID orqali natijani kuzatish imkoniyati."
+  />
   <meta property="og:url" content="/" />
   <meta property="og:image" content="" />
   <meta property="og:locale" content="uz_UZ" />
   <link rel="canonical" id="canonicalUrl" href="/" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Qarshi Yoshlar Texnoparki" />
-  <meta name="twitter:description" content="Qarshi Yoshlar Texnoparki uchun rasmiy platforma: dasturlar, uchrashuvlar, arizalar va device ID orqali natijani kuzatish imkoniyati." />
+  <meta
+    name="twitter:description"
+    content="Qarshi Yoshlar Texnoparki uchun rasmiy platforma: dasturlar, uchrashuvlar, arizalar va device ID orqali natijani kuzatish imkoniyati."
+  />
   <meta name="twitter:image" content="" />
   <meta name="theme-color" content="#f5f9ff" />
   <link
     id="siteFavicon"
     rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f80ff'/%3E%3Ctext x='50%25' y='56%25' font-size='28' text-anchor='middle' fill='white' font-family='Arial'%3EQY%3C/text%3E%3C/svg%3E"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f80ff'/%3E%3Ctext x='50%25' y='56%25' font-size='28' text-anchor='middle' fill='white' font-family='Arial'%3EQY%3C/text%3E%3C/svg%3E"
   />
   <link
     id="siteShortcutIcon"
@@ -76,354 +82,392 @@
   <div class="ambient ambient-a"></div>
   <div class="ambient ambient-b"></div>
 
-  <header class="site-header">
-    <div class="container nav-shell">
-      <a href="#home" class="brand">
+  <div class="site-layout">
+    <aside class="sidebar">
+      <a href="#home" class="sidebar-brand">
         <div class="brand-mark" id="brandMark">
           <img id="brandLogo" alt="Qarshi Yoshlar Texnoparki logotipi" hidden />
           <span id="brandInitials">QY</span>
         </div>
-        <div>
+        <div class="sidebar-brand-copy">
           <strong id="brandName">Qarshi Yoshlar Texnoparki</strong>
           <span id="brandTagline">Innovatsiya, ta'lim va startaplar markazi</span>
         </div>
       </a>
 
-      <nav class="nav-links desktop-nav">
+      <div class="sidebar-panel">
+        <p class="sidebar-label">Menyu</p>
+        <nav class="sidebar-nav">
+          <a class="sidebar-link is-active" data-nav-link href="#home">
+            <span class="sidebar-link-index">01</span>
+            <span>Asosiy</span>
+          </a>
+          <a class="sidebar-link" data-nav-link href="#about">
+            <span class="sidebar-link-index">02</span>
+            <span>Markaz haqida</span>
+          </a>
+          <a class="sidebar-link" data-nav-link href="#directions">
+            <span class="sidebar-link-index">03</span>
+            <span>Yo'nalishlar</span>
+          </a>
+          <a class="sidebar-link" data-nav-link href="#projects">
+            <span class="sidebar-link-index">04</span>
+            <span>Loyihalar</span>
+          </a>
+          <a class="sidebar-link" data-nav-link href="#meeting">
+            <span class="sidebar-link-index">05</span>
+            <span>Uchrashuv</span>
+          </a>
+          <a class="sidebar-link" data-nav-link href="#application">
+            <span class="sidebar-link-index">06</span>
+            <span>Ariza</span>
+          </a>
+          <a class="sidebar-link" data-nav-link href="#status">
+            <span class="sidebar-link-index">07</span>
+            <span>Natijalar</span>
+          </a>
+          <a class="sidebar-link" data-nav-link href="#contact">
+            <span class="sidebar-link-index">08</span>
+            <span>Bog'lanish</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-note">
+        <span class="sidebar-note-tag">Rasmiy platforma</span>
+        <p>
+          Device ID, ariza va uchrashuv oqimlari bitta qulay boshqaruvli landing page ichida jamlangan.
+        </p>
+        <a class="sidebar-cta" href="#application">Ariza topshirish</a>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menyuni ochish">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <form class="search-shell" id="quickSearchForm">
+            <span class="search-icon" aria-hidden="true">Q</span>
+            <input
+              id="quickSearchInput"
+              list="quickSearchSuggestions"
+              type="search"
+              placeholder="Sahifa bo'ylab qidirish"
+              autocomplete="off"
+            />
+            <datalist id="quickSearchSuggestions"></datalist>
+          </form>
+        </div>
+
+        <div class="topbar-actions">
+          <span class="utility-pill is-active">UZB</span>
+          <a class="utility-pill" href="#status">Status</a>
+          <div class="gov-menu" id="govMenu">
+            <button class="gov-trigger utility-pill" id="govMenuToggle" type="button">
+              Tashkilotlar
+            </button>
+            <div class="gov-dropdown" id="governmentDropdown"></div>
+          </div>
+          <button
+            class="theme-toggle"
+            id="themeToggle"
+            type="button"
+            aria-label="Rejimni almashtirish"
+            aria-pressed="false"
+          >
+            <span class="theme-toggle-knob"></span>
+            <span class="theme-toggle-label" id="themeToggleLabel">Tungi rejim</span>
+          </button>
+          <a class="nav-cta" href="#application">Boshlash</a>
+        </div>
+      </header>
+
+      <div class="mobile-menu" id="mobileMenu">
+        <a href="#home">Asosiy</a>
         <a href="#about">Markaz haqida</a>
         <a href="#directions">Yo'nalishlar</a>
         <a href="#projects">Loyihalar</a>
         <a href="#meeting">Uchrashuv</a>
         <a href="#application">Ariza</a>
-        <div class="gov-menu" id="govMenu">
-          <button class="gov-trigger" id="govMenuToggle" type="button">
+        <a href="#status">Natijalar</a>
+        <a href="#contact">Bog'lanish</a>
+        <div class="mobile-orgs">
+          <button class="mobile-org-toggle" id="mobileOrgToggle" type="button">
             Davlat tashkilotlari
           </button>
-          <div class="gov-dropdown" id="governmentDropdown"></div>
+          <div class="mobile-org-list" id="mobileOrganizations"></div>
         </div>
-      </nav>
-
-      <div class="nav-actions">
-        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Rejimni almashtirish" aria-pressed="false">
-          <span class="theme-toggle-knob"></span>
-          <span class="theme-toggle-label" id="themeToggleLabel">Tungi rejim</span>
-        </button>
-        <a class="nav-cta" href="#application">Boshlash</a>
-        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menyuni ochish">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
       </div>
-    </div>
 
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="#about">Markaz haqida</a>
-      <a href="#directions">Yo'nalishlar</a>
-      <a href="#projects">Loyihalar</a>
-      <a href="#meeting">Uchrashuv</a>
-      <a href="#application">Ariza</a>
-      <div class="mobile-orgs">
-        <button class="mobile-org-toggle" id="mobileOrgToggle" type="button">
-          Davlat tashkilotlari
-        </button>
-        <div class="mobile-org-list" id="mobileOrganizations"></div>
-      </div>
-    </div>
-  </header>
+      <main class="dashboard-main">
+        <section class="hero-board" id="home">
+          <article class="hero-showcase reveal">
+            <div class="hero-copy">
+              <div class="eyebrow" id="heroEyebrow">Qashqadaryo yoshlariga yangi avlod texnoparki</div>
+              <h1 id="heroTitle">Kelajak kasblari va startaplar uchun premium raqamli makon</h1>
+              <p class="hero-text" id="heroDescription">Platforma ma'lumotlari yuklanmoqda...</p>
 
-  <main>
-    <section class="hero section" id="home">
-      <div class="container hero-grid">
-        <div class="hero-copy reveal">
-          <div class="eyebrow" id="heroEyebrow">Qashqadaryo yoshlariga yangi avlod texnoparki</div>
-          <h1 id="heroTitle">
-            Kelajak kasblari va startaplar uchun premium raqamli makon
-          </h1>
-          <p class="hero-text" id="heroDescription">
-            Platforma ma'lumotlari yuklanmoqda...
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn btn-primary" id="heroPrimaryAction" href="#application">Ariza topshirish</a>
-            <a class="btn btn-secondary" id="heroSecondaryAction" href="#meeting">Uchrashuv belgilash</a>
-          </div>
-
-          <div class="hero-signal-strip">
-            <article class="signal-chip reveal">
-              <span>Rasmiy platforma</span>
-              <strong>Ariza, uchrashuv va status oqimi bitta sahifada</strong>
-            </article>
-            <article class="signal-chip reveal delay-1">
-              <span>Premium tajriba</span>
-              <strong>Kunduzgi va tungi rejim bilan moslashuvchan dizayn</strong>
-            </article>
-          </div>
-
-          <div class="hero-spotlights" id="heroSpotlights"></div>
-        </div>
-
-        <div class="hero-visual reveal delay-1">
-          <div class="hero-card">
-            <div id="heroMedia" class="hero-card-media"></div>
-            <div class="hero-card-overlay">
-              <span class="overlay-pill">Premium Control Hub</span>
-              <h2 id="heroCardTitle">Texnopark boshqaruvi va imkoniyatlari bitta platformada</h2>
-              <p id="heroCardDescription"></p>
-            </div>
-          </div>
-
-          <div class="hero-status-panel">
-            <div class="hero-status-head">
-              <span>Experience Layer</span>
-              <strong>Responsive premium landing page</strong>
-            </div>
-            <div class="status-track">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <div class="hero-status-meta">
-              <div>
-                <span>Mode</span>
-                <strong>Light / Dark</strong>
+              <div class="hero-actions">
+                <a class="btn btn-primary" id="heroPrimaryAction" href="#application">Ariza topshirish</a>
+                <a class="btn btn-secondary" id="heroSecondaryAction" href="#meeting">Uchrashuv belgilash</a>
               </div>
-              <div>
-                <span>Media</span>
-                <strong>Cloud-ready</strong>
+
+              <p class="search-feedback" id="searchFeedback"></p>
+              <div class="hero-spotlights" id="heroSpotlights"></div>
+            </div>
+
+            <div class="hero-media-panel">
+              <div class="hero-card">
+                <div id="heroMedia" class="hero-card-media"></div>
+                <div class="hero-card-overlay">
+                  <span class="overlay-pill">Premium Control Hub</span>
+                  <h2 id="heroCardTitle">Texnopark boshqaruvi va imkoniyatlari bitta platformada</h2>
+                  <p id="heroCardDescription"></p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <aside class="hero-side-stack">
+            <article class="side-panel reveal">
+              <div class="side-panel-head">
+                <span class="section-tag">Biz haqimizda</span>
+                <h3 id="aboutPreviewTitle">Texnopark haqida qisqacha</h3>
+              </div>
+              <div class="preview-media" id="aboutPreviewMedia"></div>
+              <p class="side-panel-text" id="aboutPreviewDescription"></p>
+            </article>
+
+            <article class="side-panel reveal delay-1">
+              <div class="side-panel-head">
+                <span class="section-tag">Ko'p so'raladigan savollar</span>
+                <h3>Tezkor javoblar</h3>
+              </div>
+              <div class="faq-list" id="faqList"></div>
+            </article>
+          </aside>
+        </section>
+
+        <section class="trust-strip reveal">
+          <div class="trust-grid" id="trustGrid"></div>
+        </section>
+
+        <section class="panel-section reveal" id="about">
+          <div class="section-head">
+            <div class="section-tag" id="aboutTag">Markaz haqida</div>
+            <h2 id="aboutTitle"></h2>
+            <p id="aboutDescription"></p>
+          </div>
+
+          <div class="split-grid panel-split">
+            <div class="feature-column">
+              <div class="feature-list" id="aboutFeatures"></div>
+            </div>
+            <div class="about-visual">
+              <div class="image-composition">
+                <div id="aboutMediaA" class="image-primary media-frame"></div>
+                <div id="aboutMediaB" class="image-secondary media-frame"></div>
+                <div class="info-badge">
+                  <strong id="aboutBadgeTitle"></strong>
+                  <span id="aboutBadgeText"></span>
+                </div>
               </div>
             </div>
           </div>
+        </section>
 
-          <div class="glass-note glass-note-top">
-            <span>Smart workflow</span>
-            <strong>Ariza, uchrashuv va status oqimi</strong>
+        <section class="panel-section reveal" id="directions">
+          <div class="section-head">
+            <div class="section-tag" id="directionsTag">Asosiy yo'nalishlar</div>
+            <h2 id="directionsTitle"></h2>
+            <p id="directionsDescription"></p>
           </div>
-          <div class="glass-note glass-note-bottom">
-            <span>Cloud-ready</span>
-            <strong>MongoDB va Cloudinary bilan ishlaydi</strong>
+          <div class="cards-grid" id="directionsGrid"></div>
+        </section>
+
+        <section class="panel-section reveal" id="projects">
+          <div class="section-head">
+            <div class="section-tag" id="projectsTag">Tanlangan loyihalar</div>
+            <h2 id="projectsTitle"></h2>
+            <p id="projectsDescription"></p>
           </div>
-        </div>
-      </div>
-    </section>
+          <div class="project-grid" id="projectsGrid"></div>
+        </section>
 
-    <section class="trust-strip reveal">
-      <div class="container trust-grid" id="trustGrid"></div>
-    </section>
+        <section class="metrics-strip panel-section reveal">
+          <div class="section-head compact-head">
+            <div class="section-tag">Asosiy ko'rsatkichlar</div>
+            <h2>Texnoparkning asosiy raqamli ko'rsatkichlari</h2>
+          </div>
+          <div class="metrics-grid" id="metricsGrid"></div>
+        </section>
 
-    <section class="section about-section" id="about">
-      <div class="container split-grid">
-        <div class="section-copy reveal">
-          <div class="section-tag" id="aboutTag">Markaz haqida</div>
-          <h2 id="aboutTitle"></h2>
-          <p id="aboutDescription"></p>
-          <div class="feature-list" id="aboutFeatures"></div>
-        </div>
+        <section class="panel-section reveal" id="news">
+          <div class="section-head">
+            <div class="section-tag" id="newsTag">Yangiliklar</div>
+            <h2 id="newsTitle"></h2>
+            <p id="newsDescription"></p>
+          </div>
+          <div class="news-grid" id="newsGrid"></div>
+        </section>
 
-        <div class="about-visual reveal delay-1">
-          <div class="image-composition">
-            <div id="aboutMediaA" class="image-primary media-frame"></div>
-            <div id="aboutMediaB" class="image-secondary media-frame"></div>
-            <div class="info-badge">
-              <strong id="aboutBadgeTitle"></strong>
-              <span id="aboutBadgeText"></span>
+        <section class="forms-board">
+          <article class="panel-section reveal" id="meeting">
+            <div class="section-head compact-head">
+              <div class="section-tag" id="meetingTag">Uchrashuv belgilash</div>
+              <h2 id="meetingTitle"></h2>
+              <p id="meetingDescription"></p>
+            </div>
+            <p class="soft-caption" id="meetingNote"></p>
+
+            <form id="meetingForm" class="stack-form">
+              <input type="text" name="fullName" placeholder="F.I.Sh." required />
+              <input type="text" name="phone" placeholder="Telefon raqam" required />
+              <input type="email" name="email" placeholder="Email manzil" />
+              <input type="text" name="organization" placeholder="Tashkilot yoki loyiha nomi" />
+              <select name="meetingType" id="meetingTypeSelect" required></select>
+              <input type="date" name="preferredDate" id="meetingDateInput" required />
+              <textarea name="note" rows="4" placeholder="Qisqa izoh yoki uchrashuv maqsadi"></textarea>
+              <button class="btn btn-primary full-width" type="submit">Uchrashuv yuborish</button>
+              <p class="form-message" id="meetingMessage"></p>
+            </form>
+          </article>
+
+          <article class="panel-section reveal delay-1" id="application">
+            <div class="section-head compact-head">
+              <div class="section-tag" id="applicationTag">Ariza topshirish</div>
+              <h2 id="applicationTitle"></h2>
+              <p id="applicationDescription"></p>
+            </div>
+            <div class="device-box">
+              <div>
+                <span>Joriy device ID</span>
+                <strong id="deviceIdLabel">Yuklanmoqda...</strong>
+              </div>
+              <button class="btn btn-secondary compact" id="copyDeviceIdBtn" type="button">Nusxa olish</button>
+            </div>
+            <p class="soft-caption" id="applicationHelper"></p>
+
+            <form id="applicationForm" class="stack-form">
+              <input type="text" name="fullName" placeholder="F.I.Sh." required />
+              <input type="text" name="phone" placeholder="Telefon raqam" required />
+              <input type="email" name="email" placeholder="Email manzil" />
+              <select name="selectedProgram" id="applicationProgramSelect" required></select>
+              <input type="url" name="portfolioLink" placeholder="Portfolio yoki loyiha havolasi (ixtiyoriy)" />
+              <textarea name="message" rows="5" placeholder="O'zingiz yoki loyihangiz haqida yozing" required></textarea>
+              <button class="btn btn-primary full-width" type="submit">Ariza yuborish</button>
+              <p class="form-message" id="applicationMessage"></p>
+            </form>
+          </article>
+        </section>
+
+        <section class="dual-board">
+          <article class="panel-section reveal" id="status">
+            <div class="section-head compact-head">
+              <div class="section-tag" id="statusTag">Ariza natijasi</div>
+              <h2 id="statusTitle"></h2>
+              <p id="statusDescription"></p>
+            </div>
+            <p class="soft-caption" id="statusHelper"></p>
+
+            <div class="status-card">
+              <form id="statusForm" class="status-form">
+                <label for="statusDeviceIdInput">Device ID</label>
+                <div class="status-input-row">
+                  <input type="text" id="statusDeviceIdInput" placeholder="Device ID kiriting" required />
+                  <button class="btn btn-primary compact" type="submit">Tekshirish</button>
+                </div>
+              </form>
+              <div class="status-list" id="statusList"></div>
+            </div>
+          </article>
+
+          <article class="panel-section reveal delay-1" id="contact">
+            <div class="section-head compact-head">
+              <div class="section-tag">Bog'lanish</div>
+              <h2 id="contactTitle"></h2>
+              <p id="contactDescription"></p>
+            </div>
+
+            <div class="contact-grid">
+              <a class="contact-item" id="contactAddressLink" href="#" target="_blank" rel="noreferrer">
+                <span>Manzil</span>
+                <strong id="contactAddress"></strong>
+              </a>
+              <a class="contact-item" id="contactPhoneLink" href="#">
+                <span>Telefon</span>
+                <strong id="contactPhone"></strong>
+              </a>
+              <a class="contact-item" id="contactEmailLink" href="#">
+                <span>Email</span>
+                <strong id="contactEmail"></strong>
+              </a>
+              <div class="contact-item">
+                <span>Ish vaqti</span>
+                <strong id="contactWorkingHours"></strong>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-shell">
+          <div class="footer-brand">
+            <div class="footer-brand-top">
+              <div class="brand-mark footer-brand-mark" id="footerBrandMark">
+                <img id="footerLogo" alt="Qarshi Yoshlar Texnoparki logotipi" hidden />
+                <span id="footerInitials">QY</span>
+              </div>
+              <div>
+                <strong id="footerName">Qarshi Yoshlar Texnoparki</strong>
+                <p id="footerText">Premium light dizayndagi rasmiy platforma.</p>
+              </div>
+            </div>
+            <span class="footer-pill" id="footerOfficialLabel">Rasmiy axborot platformasi</span>
+            <p class="footer-official-note" id="footerOfficialNote"></p>
+          </div>
+
+          <div class="footer-column">
+            <h3>Asosiy bo'limlar</h3>
+            <div class="footer-links">
+              <a href="#about">Markaz haqida</a>
+              <a href="#directions">Yo'nalishlar</a>
+              <a href="#projects">Loyihalar</a>
+              <a href="#meeting">Uchrashuv</a>
+              <a href="#application">Ariza</a>
+              <a href="#status">Natijalar</a>
+            </div>
+          </div>
+
+          <div class="footer-column footer-org-column">
+            <h3>Davlat tashkilotlari</h3>
+            <div class="footer-org-list" id="footerOrganizations"></div>
+          </div>
+
+          <div class="footer-column">
+            <h3>Rasmiy aloqa</h3>
+            <div class="footer-links footer-contacts">
+              <a id="footerPhoneLink" href="#">Telefon</a>
+              <a id="footerEmailLink" href="#">Email</a>
+              <a id="footerMapLink" href="#" target="_blank" rel="noreferrer">Manzil</a>
+              <a id="footerTelegramLink" href="#" target="_blank" rel="noreferrer">Telegram</a>
+              <a id="footerInstagramLink" href="#" target="_blank" rel="noreferrer">Instagram</a>
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section class="section section-soft" id="directions">
-      <div class="container">
-        <div class="section-head reveal">
-          <div class="section-tag" id="directionsTag">Asosiy yo'nalishlar</div>
-          <h2 id="directionsTitle"></h2>
-          <p id="directionsDescription"></p>
+        <div class="footer-bottom">
+          <p id="footerLegalText"></p>
         </div>
-
-        <div class="cards-grid" id="directionsGrid"></div>
-      </div>
-    </section>
-
-    <section class="section" id="projects">
-      <div class="container">
-        <div class="section-head reveal">
-          <div class="section-tag" id="projectsTag">Tanlangan loyihalar</div>
-          <h2 id="projectsTitle"></h2>
-          <p id="projectsDescription"></p>
-        </div>
-
-        <div class="project-grid" id="projectsGrid"></div>
-      </div>
-    </section>
-
-    <section class="section metrics-section">
-      <div class="container metrics-grid" id="metricsGrid"></div>
-    </section>
-
-    <section class="section section-soft" id="news">
-      <div class="container">
-        <div class="section-head reveal">
-          <div class="section-tag" id="newsTag">Yangiliklar</div>
-          <h2 id="newsTitle"></h2>
-          <p id="newsDescription"></p>
-        </div>
-
-        <div class="news-grid" id="newsGrid"></div>
-      </div>
-    </section>
-
-    <section class="section interaction-section" id="meeting">
-      <div class="container interaction-grid">
-        <article class="interaction-card reveal">
-          <div class="section-tag" id="meetingTag">Uchrashuv belgilash</div>
-          <h2 id="meetingTitle"></h2>
-          <p id="meetingDescription"></p>
-          <p class="soft-caption" id="meetingNote"></p>
-
-          <form id="meetingForm" class="stack-form">
-            <input type="text" name="fullName" placeholder="F.I.Sh." required />
-            <input type="text" name="phone" placeholder="Telefon raqam" required />
-            <input type="email" name="email" placeholder="Email manzil" />
-            <input type="text" name="organization" placeholder="Tashkilot yoki loyiha nomi" />
-            <select name="meetingType" id="meetingTypeSelect" required></select>
-            <input type="date" name="preferredDate" id="meetingDateInput" required />
-            <textarea name="note" rows="4" placeholder="Qisqa izoh yoki uchrashuv maqsadi"></textarea>
-            <button class="btn btn-primary full-width" type="submit">Uchrashuv yuborish</button>
-            <p class="form-message" id="meetingMessage"></p>
-          </form>
-        </article>
-
-        <article class="interaction-card reveal delay-1" id="application">
-          <div class="section-tag" id="applicationTag">Ariza topshirish</div>
-          <h2 id="applicationTitle"></h2>
-          <p id="applicationDescription"></p>
-          <div class="device-box">
-            <div>
-              <span>Joriy device ID</span>
-              <strong id="deviceIdLabel">Yuklanmoqda...</strong>
-            </div>
-            <button class="btn btn-secondary compact" id="copyDeviceIdBtn" type="button">Nusxa olish</button>
-          </div>
-          <p class="soft-caption" id="applicationHelper"></p>
-
-          <form id="applicationForm" class="stack-form">
-            <input type="text" name="fullName" placeholder="F.I.Sh." required />
-            <input type="text" name="phone" placeholder="Telefon raqam" required />
-            <input type="email" name="email" placeholder="Email manzil" />
-            <select name="selectedProgram" id="applicationProgramSelect" required></select>
-            <input type="url" name="portfolioLink" placeholder="Portfolio yoki loyiha havolasi (ixtiyoriy)" />
-            <textarea name="message" rows="5" placeholder="O'zingiz yoki loyihangiz haqida yozing" required></textarea>
-            <button class="btn btn-primary full-width" type="submit">Ariza yuborish</button>
-            <p class="form-message" id="applicationMessage"></p>
-          </form>
-        </article>
-      </div>
-    </section>
-
-    <section class="section status-section" id="status">
-      <div class="container status-grid">
-        <div class="section-copy reveal">
-          <div class="section-tag" id="statusTag">Ariza natijasi</div>
-          <h2 id="statusTitle"></h2>
-          <p id="statusDescription"></p>
-          <p class="soft-caption" id="statusHelper"></p>
-        </div>
-
-        <div class="status-card reveal delay-1">
-          <form id="statusForm" class="status-form">
-            <label for="statusDeviceIdInput">Device ID</label>
-            <div class="status-input-row">
-              <input type="text" id="statusDeviceIdInput" placeholder="Device ID kiriting" required />
-              <button class="btn btn-primary compact" type="submit">Tekshirish</button>
-            </div>
-          </form>
-
-          <div class="status-list" id="statusList"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section contact-section">
-      <div class="container contact-shell reveal">
-        <div>
-          <div class="section-tag">Bog'lanish</div>
-          <h2 id="contactTitle"></h2>
-          <p id="contactDescription"></p>
-        </div>
-
-        <div class="contact-grid">
-          <a class="contact-item" id="contactAddressLink" href="#" target="_blank" rel="noreferrer">
-            <span>Manzil</span>
-            <strong id="contactAddress"></strong>
-          </a>
-          <a class="contact-item" id="contactPhoneLink" href="#">
-            <span>Telefon</span>
-            <strong id="contactPhone"></strong>
-          </a>
-          <a class="contact-item" id="contactEmailLink" href="#">
-            <span>Email</span>
-            <strong id="contactEmail"></strong>
-          </a>
-          <div class="contact-item">
-            <span>Ish vaqti</span>
-            <strong id="contactWorkingHours"></strong>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-shell">
-      <div class="footer-brand">
-        <div class="footer-brand-top">
-          <div class="brand-mark footer-brand-mark" id="footerBrandMark">
-            <img id="footerLogo" alt="Qarshi Yoshlar Texnoparki logotipi" hidden />
-            <span id="footerInitials">QY</span>
-          </div>
-          <div>
-            <strong id="footerName">Qarshi Yoshlar Texnoparki</strong>
-            <p id="footerText">Premium light dizayndagi rasmiy platforma.</p>
-          </div>
-        </div>
-        <span class="footer-pill" id="footerOfficialLabel">Rasmiy axborot platformasi</span>
-        <p class="footer-official-note" id="footerOfficialNote"></p>
-      </div>
-
-      <div class="footer-column">
-        <h3>Asosiy bo'limlar</h3>
-        <div class="footer-links">
-          <a href="#about">Markaz haqida</a>
-          <a href="#directions">Yo'nalishlar</a>
-          <a href="#projects">Loyihalar</a>
-          <a href="#meeting">Uchrashuv</a>
-          <a href="#application">Ariza</a>
-          <a href="#status">Natijalar</a>
-        </div>
-      </div>
-
-      <div class="footer-column footer-org-column">
-        <h3>Davlat tashkilotlari</h3>
-        <div class="footer-org-list" id="footerOrganizations"></div>
-      </div>
-
-      <div class="footer-column">
-        <h3>Rasmiy aloqa</h3>
-        <div class="footer-links footer-contacts">
-          <a id="footerPhoneLink" href="#">Telefon</a>
-          <a id="footerEmailLink" href="#">Email</a>
-          <a id="footerMapLink" href="#" target="_blank" rel="noreferrer">Manzil</a>
-          <a id="footerTelegramLink" href="#" target="_blank" rel="noreferrer">Telegram</a>
-          <a id="footerInstagramLink" href="#" target="_blank" rel="noreferrer">Instagram</a>
-        </div>
-      </div>
+      </footer>
     </div>
-
-    <div class="container footer-bottom">
-      <p id="footerLegalText"></p>
-    </div>
-  </footer>
+  </div>
 
   <script src="script.js"></script>
 </body>

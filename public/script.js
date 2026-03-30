@@ -13,6 +13,10 @@ const mobileOrganizations = document.getElementById("mobileOrganizations");
 const themeToggle = document.getElementById("themeToggle");
 const themeToggleLabel = document.getElementById("themeToggleLabel");
 const scrollProgress = document.getElementById("scrollProgress");
+const quickSearchForm = document.getElementById("quickSearchForm");
+const quickSearchInput = document.getElementById("quickSearchInput");
+const quickSearchSuggestions = document.getElementById("quickSearchSuggestions");
+const searchFeedback = document.getElementById("searchFeedback");
 const meetingForm = document.getElementById("meetingForm");
 const applicationForm = document.getElementById("applicationForm");
 const statusForm = document.getElementById("statusForm");
@@ -21,6 +25,7 @@ const deviceIdLabel = document.getElementById("deviceIdLabel");
 const copyDeviceIdBtn = document.getElementById("copyDeviceIdBtn");
 const meetingDateInput = document.getElementById("meetingDateInput");
 const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+const sidebarLinks = Array.from(document.querySelectorAll("[data-nav-link]"));
 const systemThemeQuery =
   window.matchMedia && typeof window.matchMedia === "function"
     ? window.matchMedia("(prefers-color-scheme: dark)")
@@ -44,6 +49,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 function bindUi() {
   if (themeToggle) {
     themeToggle.addEventListener("click", toggleTheme);
+  }
+
+  if (quickSearchForm) {
+    quickSearchForm.addEventListener("submit", handleQuickSearch);
   }
 
   if (menuToggle) {
@@ -93,6 +102,7 @@ function bindUi() {
 function bindWindowEffects() {
   updateScrollProgress();
   window.addEventListener("scroll", updateScrollProgress, { passive: true });
+  initializeSectionObserver();
 }
 
 async function loadSiteContent() {
@@ -127,6 +137,9 @@ function renderContent(content) {
 
   updateSeoMeta(content);
   renderBrandAssets(content.general);
+  renderAboutPreview(content);
+  renderFaq(content);
+  hydrateSearch(content);
 
   setText("brandName", content.general.organizationName);
   setText("brandTagline", content.general.tagline);
@@ -208,6 +221,142 @@ function renderContent(content) {
   setText("footerLegalText", content.footer?.legalText || "");
 
   renderGovernmentOrganizations(content.governmentOrganizations || []);
+}
+
+function renderAboutPreview(content) {
+  setText("aboutPreviewTitle", content.about.title);
+  setText("aboutPreviewDescription", content.about.description);
+  renderMedia(
+    "aboutPreviewMedia",
+    content.about.imageA || content.hero.image,
+    `${content.general.organizationName} preview`,
+    content.about.imageAType || content.hero.mediaType
+  );
+}
+
+function renderFaq(content) {
+  const target = document.getElementById("faqList");
+
+  if (!target) {
+    return;
+  }
+
+  const items = [
+    {
+      question: "Ariza topshirish qanday ishlaydi?",
+      answer: content.applicationSection.helperText || content.applicationSection.description
+    },
+    {
+      question: "Uchrashuv qanday belgilanadi?",
+      answer: content.appointmentSection.note || content.appointmentSection.description
+    },
+    {
+      question: "Natijani qanday ko'raman?",
+      answer: content.statusSection.helperText || content.statusSection.description
+    }
+  ];
+
+  target.innerHTML = items
+    .map(
+      (item, index) => `
+        <article class="faq-item ${index === 0 ? "open" : ""}">
+          <button class="faq-question" type="button">
+            <span>${escapeHtml(item.question)}</span>
+            <span>${index === 0 ? "-" : "+"}</span>
+          </button>
+          <div class="faq-answer">
+            <p>${escapeHtml(item.answer)}</p>
+          </div>
+        </article>
+      `
+    )
+    .join("");
+
+  target.querySelectorAll(".faq-question").forEach((button) => {
+    button.addEventListener("click", () => {
+      const current = button.closest(".faq-item");
+
+      target.querySelectorAll(".faq-item").forEach((item) => {
+        const icon = item.querySelector(".faq-question span:last-child");
+        const isCurrent = item === current;
+        item.classList.toggle("open", isCurrent ? !item.classList.contains("open") : false);
+
+        if (icon) {
+          icon.textContent = item.classList.contains("open") ? "-" : "+";
+        }
+      });
+    });
+  });
+}
+
+function hydrateSearch(content) {
+  const targets = [
+    {
+      label: "Asosiy",
+      id: "home",
+      text: [content.hero.title, content.hero.highlight, content.hero.description].join(" ")
+    },
+    {
+      label: "Markaz haqida",
+      id: "about",
+      text: [content.about.title, content.about.description, ...(content.about.features || [])].join(" ")
+    },
+    {
+      label: "Yo'nalishlar",
+      id: "directions",
+      text: [
+        content.directions.title,
+        content.directions.description,
+        ...(content.directions.items || []).flatMap((item) => [item.title, item.description])
+      ].join(" ")
+    },
+    {
+      label: "Loyihalar",
+      id: "projects",
+      text: [
+        content.projects.title,
+        content.projects.description,
+        ...(content.projects.items || []).flatMap((item) => [item.title, item.summary, item.category])
+      ].join(" ")
+    },
+    {
+      label: "Yangiliklar",
+      id: "news",
+      text: [
+        content.news.title,
+        content.news.description,
+        ...(content.news.items || []).flatMap((item) => [item.title, item.description, item.date])
+      ].join(" ")
+    },
+    {
+      label: "Uchrashuv",
+      id: "meeting",
+      text: [content.appointmentSection.title, content.appointmentSection.description, content.appointmentSection.note].join(" ")
+    },
+    {
+      label: "Ariza",
+      id: "application",
+      text: [content.applicationSection.title, content.applicationSection.description, content.applicationSection.helperText].join(" ")
+    },
+    {
+      label: "Natijalar",
+      id: "status",
+      text: [content.statusSection.title, content.statusSection.description, content.statusSection.helperText].join(" ")
+    },
+    {
+      label: "Bog'lanish",
+      id: "contact",
+      text: [content.contact.title, content.contact.description, content.contact.address].join(" ")
+    }
+  ];
+
+  state.searchTargets = targets;
+
+  if (quickSearchSuggestions) {
+    quickSearchSuggestions.innerHTML = targets
+      .map((item) => `<option value="${escapeHtml(item.label)}"></option>`)
+      .join("");
+  }
 }
 
 function renderHeroSpotlights(items) {
@@ -471,6 +620,39 @@ function initializeCounterObserver() {
   counters.forEach((counter) => observer.observe(counter));
 }
 
+function initializeSectionObserver() {
+  if (!sidebarLinks.length) {
+    return;
+  }
+
+  const sections = sidebarLinks
+    .map((link) => {
+      const href = link.getAttribute("href") || "";
+      return href.startsWith("#") ? document.querySelector(href) : null;
+    })
+    .filter(Boolean);
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((left, right) => right.intersectionRatio - left.intersectionRatio)[0];
+
+      if (!visible || !visible.target.id) {
+        return;
+      }
+
+      setActiveNav(`#${visible.target.id}`);
+    },
+    {
+      threshold: 0.35,
+      rootMargin: "-15% 0px -45% 0px"
+    }
+  );
+
+  sections.forEach((section) => observer.observe(section));
+}
+
 function animateCounter(element) {
   const targetValue = Number(element.dataset.counter || 0);
   const suffix = element.dataset.suffix || "";
@@ -536,6 +718,12 @@ function setText(id, value) {
   if (element) {
     element.textContent = value || "";
   }
+}
+
+function setActiveNav(hash) {
+  sidebarLinks.forEach((link) => {
+    link.classList.toggle("is-active", link.getAttribute("href") === hash);
+  });
 }
 
 function setImage(id, src, alt) {
@@ -790,6 +978,39 @@ function updateScrollProgress() {
   const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
   const progress = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
   scrollProgress.style.transform = `scaleX(${progress})`;
+}
+
+function handleQuickSearch(event) {
+  event.preventDefault();
+  const query = String(quickSearchInput ? quickSearchInput.value : "").trim().toLowerCase();
+
+  if (!query) {
+    showMessage("searchFeedback", "Qidirish uchun kalit so'z kiriting.");
+    return;
+  }
+
+  const targets = Array.isArray(state.searchTargets) ? state.searchTargets : [];
+  const match = targets.find((item) => {
+    const label = String(item.label || "").toLowerCase();
+    const text = String(item.text || "").toLowerCase();
+    return label.includes(query) || text.includes(query);
+  });
+
+  if (!match) {
+    showMessage("searchFeedback", "Mos bo'lim topilmadi.");
+    return;
+  }
+
+  const target = document.getElementById(match.id);
+
+  if (!target) {
+    showMessage("searchFeedback", "Topilgan bo'lim ochilmadi.");
+    return;
+  }
+
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+  setActiveNav(`#${match.id}`);
+  showMessage("searchFeedback", `${match.label} bo'limiga o'tildi.`);
 }
 
 function readStoredTheme() {
