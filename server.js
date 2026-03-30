@@ -1,5 +1,6 @@
 const path = require("path");
 const crypto = require("crypto");
+const fs = require("fs/promises");
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -671,9 +672,17 @@ app.post("/api/admin/upload", requireAdmin, upload.single("image"), async (req, 
   }
 });
 
-app.get([ADMIN_ROUTE, `${ADMIN_ROUTE}/`], (req, res) => {
-  res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
-  res.sendFile(path.join(ADMIN_DIR, "index.html"));
+app.get([ADMIN_ROUTE, `${ADMIN_ROUTE}/`], async (req, res, next) => {
+  try {
+    const adminHtmlPath = path.join(ADMIN_DIR, "index.html");
+    const template = await fs.readFile(adminHtmlPath, "utf8");
+    const html = template.replaceAll("__ADMIN_ROUTE__", ADMIN_ROUTE);
+
+    res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+    res.type("html").send(html);
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.use(
