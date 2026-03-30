@@ -83,7 +83,7 @@ function renderContent(content) {
   setText("heroDescription", content.hero.description);
   setText("heroCardTitle", content.hero.cardTitle);
   setText("heroCardDescription", content.hero.cardDescription);
-  setImage("heroImage", content.hero.image, content.general.organizationName);
+  renderMedia("heroMedia", content.hero.image, content.general.organizationName, content.hero.mediaType);
   setLink("heroPrimaryAction", content.hero.primaryActionLink, content.hero.primaryActionLabel);
   setLink("heroSecondaryAction", content.hero.secondaryActionLink, content.hero.secondaryActionLabel);
 
@@ -95,8 +95,8 @@ function renderContent(content) {
   setText("aboutDescription", content.about.description);
   setText("aboutBadgeTitle", content.about.badgeTitle);
   setText("aboutBadgeText", content.about.badgeText);
-  setImage("aboutImageA", content.about.imageA, `${content.general.organizationName} foto 1`);
-  setImage("aboutImageB", content.about.imageB, `${content.general.organizationName} foto 2`);
+  renderMedia("aboutMediaA", content.about.imageA, `${content.general.organizationName} foto 1`, content.about.imageAType);
+  renderMedia("aboutMediaB", content.about.imageB, `${content.general.organizationName} foto 2`, content.about.imageBType);
   renderFeatureList(content.about.features || []);
 
   setText("directionsTag", content.directions.tag);
@@ -194,7 +194,7 @@ function renderProjects(items) {
     .map(
       (item) => `
         <article class="project-card reveal ${item.featured ? "featured" : ""}">
-          <img class="project-card-image" src="${item.image}" alt="${item.title}" />
+          ${renderProjectMedia(item)}
           <div class="project-card-body">
             <span class="project-category">${item.category}</span>
             <h3>${item.title}</h3>
@@ -473,12 +473,7 @@ function setText(id, value) {
 }
 
 function setImage(id, src, alt) {
-  const element = document.getElementById(id);
-
-  if (element) {
-    element.src = src || "";
-    element.alt = alt || "";
-  }
+  renderMedia(id, src, alt, "image");
 }
 
 function setLink(id, href, text) {
@@ -520,4 +515,38 @@ function getOrCreateDeviceId() {
 
   localStorage.setItem(storageKey, nextId);
   return nextId;
+}
+
+function renderMedia(targetId, src, alt, mediaType = "image") {
+  const target = document.getElementById(targetId);
+
+  if (!target) {
+    return;
+  }
+
+  if (!src) {
+    target.innerHTML = "";
+    return;
+  }
+
+  const resolvedType = mediaType || inferMediaType(src);
+
+  target.innerHTML =
+    resolvedType === "video"
+      ? `<video src="${src}" autoplay muted loop playsinline controls></video>`
+      : `<img src="${src}" alt="${alt || ""}" />`;
+}
+
+function renderProjectMedia(item) {
+  const mediaType = item.mediaType || inferMediaType(item.image);
+
+  if (mediaType === "video") {
+    return `<video class="project-card-video" src="${item.image}" controls muted playsinline preload="metadata"></video>`;
+  }
+
+  return `<img class="project-card-image" src="${item.image}" alt="${item.title}" />`;
+}
+
+function inferMediaType(url) {
+  return /\.(mp4|webm|ogg|mov)$/i.test(String(url || "")) ? "video" : "image";
 }

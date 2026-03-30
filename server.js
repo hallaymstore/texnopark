@@ -25,7 +25,7 @@ const MAX_LOGIN_ATTEMPTS = 6;
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 8 * 1024 * 1024
+    fileSize: 50 * 1024 * 1024
   }
 });
 
@@ -59,6 +59,7 @@ const DEFAULT_SITE_CONTENT = {
     secondaryActionLink: "#meeting",
     image:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80",
+    mediaType: "image",
     cardTitle: "Texnopark boshqaruvi va imkoniyatlari bitta platformada",
     cardDescription:
       "Talabgorlar uchun qulay murojaat oqimi, admin uchun yashirin boshqaruv paneli va media kontentni Cloudinary orqali yuritish tizimi."
@@ -91,8 +92,10 @@ const DEFAULT_SITE_CONTENT = {
       "Mazkur sayt rasmiy ishonchlilikni zamonaviy premium ko'rinish bilan uyg'unlashtiradi. Har bir bo'lim admin panel orqali yangilanadi, foydalanuvchilar esa ro'yxatdan o'tmasdan qurilma ID yordamida o'z ariza natijasini kuzata oladi.",
     imageA:
       "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+    imageAType: "image",
     imageB:
       "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+    imageBType: "image",
     badgeTitle: "Yagona boshqaruv nuqtasi",
     badgeText:
       "Kontent, yangiliklar, uchrashuvlar, arizalar va natijalar bitta boshqaruv panelidan tahrir qilinadi.",
@@ -144,6 +147,7 @@ const DEFAULT_SITE_CONTENT = {
         summary: "Yoshlarni dasturlash, dizayn va startap yo'nalishlariga bosqichma-bosqich olib kiruvchi asosiy dastur.",
         image:
           "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80",
+        mediaType: "image",
         featured: true
       },
       {
@@ -152,6 +156,7 @@ const DEFAULT_SITE_CONTENT = {
         summary: "Amaliy sensorlar, mikrokontrollerlar va real qurilmalar bilan tajriba maydoni.",
         image:
           "https://images.unsplash.com/photo-1581092335397-9583eb92d232?auto=format&fit=crop&w=1200&q=80",
+        mediaType: "image",
         featured: false
       },
       {
@@ -160,6 +165,7 @@ const DEFAULT_SITE_CONTENT = {
         summary: "Hududiy tashabbus va o'quv jarayonini kuzatish uchun data-driven boshqaruv paneli.",
         image:
           "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80",
+        mediaType: "image",
         featured: false
       },
       {
@@ -168,6 +174,7 @@ const DEFAULT_SITE_CONTENT = {
         summary: "Iqtidorli jamoalarni taqdimot, mentorlik va hamkorlik bilan bog'laydigan dastur.",
         image:
           "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
+        mediaType: "image",
         featured: false
       }
     ]
@@ -638,7 +645,7 @@ app.put("/api/admin/site-content", requireAdmin, async (req, res, next) => {
   }
 });
 
-app.post("/api/admin/upload", requireAdmin, upload.single("image"), async (req, res, next) => {
+app.post("/api/admin/upload", requireAdmin, upload.single("media"), async (req, res, next) => {
   try {
     if (!hasCloudinary) {
       return res.status(400).json({
@@ -648,23 +655,24 @@ app.post("/api/admin/upload", requireAdmin, upload.single("image"), async (req, 
 
     if (!req.file) {
       return res.status(400).json({
-        message: "Rasm fayli tanlanmagan."
+        message: "Media fayli tanlanmagan."
       });
     }
 
-    if (!req.file.mimetype.startsWith("image/")) {
+    if (!req.file.mimetype.startsWith("image/") && !req.file.mimetype.startsWith("video/")) {
       return res.status(400).json({
-        message: "Faqat rasm fayllari qabul qilinadi."
+        message: "Faqat rasm va video fayllari qabul qilinadi."
       });
     }
 
     const result = await uploadToCloudinary(req.file);
 
     res.json({
-      message: "Rasm Cloudinary ga yuklandi.",
+      message: "Media Cloudinary ga yuklandi.",
       data: {
         url: result.secure_url,
-        publicId: result.public_id
+        publicId: result.public_id,
+        resourceType: result.resource_type
       }
     });
   } catch (error) {
@@ -1151,7 +1159,7 @@ function uploadToCloudinary(file) {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: process.env.CLOUDINARY_FOLDER || "qarshi-texnopark",
-        resource_type: "image",
+        resource_type: "auto",
         use_filename: true,
         unique_filename: true
       },

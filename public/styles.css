@@ -383,9 +383,15 @@ textarea {
   box-shadow: var(--shadow);
 }
 
-.hero-card img {
+.hero-card-media,
+.hero-card-media img,
+.hero-card-media video {
   width: 100%;
   height: 620px;
+}
+
+.hero-card-media img,
+.hero-card-media video {
   object-fit: cover;
 }
 
@@ -494,9 +500,16 @@ textarea {
 .image-primary,
 .image-secondary {
   position: absolute;
-  object-fit: cover;
   border-radius: 28px;
   box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.media-frame img,
+.media-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .image-primary {
@@ -603,7 +616,8 @@ textarea {
   grid-column: span 6;
 }
 
-.project-card-image {
+.project-card-image,
+.project-card-video {
   width: 100%;
   height: 260px;
   object-fit: cover;
@@ -916,7 +930,9 @@ textarea {
   }
 
   .hero-card,
-  .hero-card img {
+  .hero-card-media,
+  .hero-card-media img,
+  .hero-card-media video {
     min-height: 420px;
     height: 420px;
   }

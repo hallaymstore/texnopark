@@ -39,7 +39,7 @@
         <div>
           <span class="eyebrow">Control Dashboard</span>
           <h2 id="dashboardWelcome">Admin panel</h2>
-          <p>Public saytda ko'rinmaydigan boshqaruv qismi. Kontentni saqlashdan oldin JSON bloklarini tekshirib chiqing.</p>
+          <p>Public saytda ko'rinmaydigan boshqaruv qismi. Barcha bo'limlar oddiy formalar orqali boshqariladi.</p>
         </div>
         <div class="topbar-actions">
           <a class="ghost-btn" href="/" target="_blank" rel="noreferrer">Saytni ochish</a>
@@ -173,33 +173,16 @@
           <article class="panel">
             <div class="panel-head">
               <div>
-                <h3>Cloudinary upload</h3>
-                <p>Rasmni yuklang va olingan URL ni kerakli inputga joylang.</p>
+                <h3>Qulay tahrirlash</h3>
+                <p>Element qo'shing, media faylni tanlang va yakunda faqat `Saqlash` tugmasini bosing.</p>
               </div>
             </div>
-
-            <form id="uploadForm" class="stack-form">
-              <input id="uploadFileInput" type="file" accept="image/*" required />
-              <button class="primary-btn" type="submit">Rasm yuklash</button>
-              <textarea id="uploadResult" rows="4" placeholder="Yuklangan rasm URL shu yerda chiqadi" readonly></textarea>
-              <button class="ghost-btn" id="copyUploadUrlBtn" type="button">URL ni nusxa olish</button>
-              <p class="message" id="uploadMessage"></p>
-            </form>
-          </article>
-
-          <article class="panel">
-            <div class="panel-head">
-              <div>
-                <h3>JSON eslatma</h3>
-                <p>Array bloklar uchun quyidagi formatdan foydalaning.</p>
-              </div>
-            </div>
-            <pre class="json-help">[
-  {
-    "title": "Nomi",
-    "description": "Tavsif"
-  }
-]</pre>
+            <ul class="helper-list">
+              <li>Hero, about va loyihalar uchun faylni qurilmadan tanlang.</li>
+              <li>Takrorlanuvchi bloklar uchun `Qo'shish` tugmasidan foydalaning.</li>
+              <li>Media yuklangach preview darhol ko'rinadi.</li>
+              <li>Hamma o'zgarishlarni oxirida bitta marta saqlash kifoya.</li>
+            </ul>
           </article>
         </aside>
       </div>
