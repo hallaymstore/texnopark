@@ -115,10 +115,29 @@ const editorConfigs = [
     addLabel: "Yo'nalish qo'shish",
     createItem: () => "",
     fields: [{ key: "__self", label: "Yo'nalish", placeholder: "Sun'iy intellekt va dasturlash" }]
+  },
+  {
+    name: "governmentOrganizations",
+    title: "Davlat tashkilotlari",
+    description: "Header va footerda ko'rinadigan rasmiy tashkilotlar ro'yxati.",
+    addLabel: "Tashkilot qo'shish",
+    createItem: () => ({ name: "", url: "", description: "" }),
+    fields: [
+      { key: "name", label: "Tashkilot nomi", placeholder: "Yoshlar ishlari agentligi" },
+      { key: "url", label: "Rasmiy havola", placeholder: "https://..." },
+      { key: "description", label: "Qisqa izoh", type: "textarea", placeholder: "Qisqa rasmiy tavsif" }
+    ]
   }
 ];
 
 const staticMediaConfigs = [
+  {
+    fieldName: "general.logo",
+    typeField: "general.logoType",
+    title: "Sayt logotipi",
+    description: "Header, footer va favicon uchun ishlatiladigan rasmni yuklang.",
+    accept: "image/*"
+  },
   {
     fieldName: "hero.image",
     typeField: "hero.mediaType",
@@ -412,7 +431,11 @@ function setupStaticMediaEditors() {
 function fillContentForm(content) {
   setField("general.organizationName", content.general.organizationName);
   setField("general.organizationShortName", content.general.organizationShortName);
+  setField("general.logo", content.general.logo || "");
+  setField("general.logoType", content.general.logoType || "image");
   setField("general.tagline", content.general.tagline);
+  setField("general.seoTitle", content.general.seoTitle || "");
+  setField("general.seoKeywords", content.general.seoKeywords || "");
   setField("general.metaDescription", content.general.metaDescription);
 
   setField("hero.eyebrow", content.hero.eyebrow);
@@ -474,6 +497,9 @@ function fillContentForm(content) {
   setField("contact.mapLink", content.contact.mapLink);
   setField("contact.telegram", content.contact.telegram);
   setField("contact.instagram", content.contact.instagram);
+  setField("footer.officialLabel", content.footer?.officialLabel || "");
+  setField("footer.officialNote", content.footer?.officialNote || "");
+  setField("footer.legalText", content.footer?.legalText || "");
 
   state.editorData.heroSpotlights = deepCopy(content.heroSpotlights || []);
   state.editorData.trustItems = deepCopy(content.trustItems || []);
@@ -489,6 +515,7 @@ function fillContentForm(content) {
   state.editorData["applicationSection.applicationOptions"] = deepCopy(
     content.applicationSection.applicationOptions || []
   );
+  state.editorData.governmentOrganizations = deepCopy(content.governmentOrganizations || []);
 
   syncAllEditorFields();
   renderAllFriendlyEditors();
@@ -500,7 +527,11 @@ function collectContentForm() {
     general: {
       organizationName: getField("general.organizationName"),
       organizationShortName: getField("general.organizationShortName"),
+      logo: getField("general.logo"),
+      logoType: getField("general.logoType") || "image",
       tagline: getField("general.tagline"),
+      seoTitle: getField("general.seoTitle"),
+      seoKeywords: getField("general.seoKeywords"),
       metaDescription: getField("general.metaDescription")
     },
     hero: {
@@ -580,6 +611,12 @@ function collectContentForm() {
       mapLink: getField("contact.mapLink"),
       telegram: getField("contact.telegram"),
       instagram: getField("contact.instagram")
+    },
+    governmentOrganizations: state.editorData.governmentOrganizations || [],
+    footer: {
+      officialLabel: getField("footer.officialLabel"),
+      officialNote: getField("footer.officialNote"),
+      legalText: getField("footer.legalText")
     }
   };
 }

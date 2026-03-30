@@ -5,6 +5,10 @@ const state = {
 
 const menuToggle = document.getElementById("menuToggle");
 const mobileMenu = document.getElementById("mobileMenu");
+const govMenu = document.getElementById("govMenu");
+const govMenuToggle = document.getElementById("govMenuToggle");
+const mobileOrgToggle = document.getElementById("mobileOrgToggle");
+const mobileOrganizations = document.getElementById("mobileOrganizations");
 const meetingForm = document.getElementById("meetingForm");
 const applicationForm = document.getElementById("applicationForm");
 const statusForm = document.getElementById("statusForm");
@@ -12,6 +16,8 @@ const statusInput = document.getElementById("statusDeviceIdInput");
 const deviceIdLabel = document.getElementById("deviceIdLabel");
 const copyDeviceIdBtn = document.getElementById("copyDeviceIdBtn");
 const meetingDateInput = document.getElementById("meetingDateInput");
+const defaultFavicon =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f80ff'/%3E%3Ctext x='50%25' y='56%25' font-size='28' text-anchor='middle' fill='white' font-family='Arial'%3EQY%3C/text%3E%3C/svg%3E";
 
 document.addEventListener("DOMContentLoaded", async () => {
   deviceIdLabel.textContent = state.deviceId;
@@ -31,8 +37,29 @@ function bindUi() {
     });
   }
 
-  document.querySelectorAll(".mobile-menu a").forEach((link) => {
-    link.addEventListener("click", () => mobileMenu.classList.remove("open"));
+  if (govMenuToggle) {
+    govMenuToggle.addEventListener("click", () => {
+      govMenu.classList.toggle("open");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!govMenu.contains(event.target)) {
+        govMenu.classList.remove("open");
+      }
+    });
+  }
+
+  if (mobileOrgToggle) {
+    mobileOrgToggle.addEventListener("click", () => {
+      mobileOrganizations.classList.toggle("open");
+    });
+  }
+
+  mobileMenu.addEventListener("click", (event) => {
+    if (event.target.closest("a")) {
+      mobileMenu.classList.remove("open");
+      mobileOrganizations.classList.remove("open");
+    }
   });
 
   copyDeviceIdBtn.addEventListener("click", async () => {
@@ -66,12 +93,20 @@ async function loadSiteContent() {
 }
 
 function renderContent(content) {
-  document.title = content.general.organizationName;
+  document.title = content.general.seoTitle || content.general.organizationName;
   const metaDescription = document.querySelector('meta[name="description"]');
+  const metaKeywords = document.querySelector('meta[name="keywords"]');
 
   if (metaDescription) {
     metaDescription.setAttribute("content", content.general.metaDescription);
   }
+
+  if (metaKeywords) {
+    metaKeywords.setAttribute("content", content.general.seoKeywords || "");
+  }
+
+  updateSeoMeta(content);
+  renderBrandAssets(content.general);
 
   setText("brandName", content.general.organizationName);
   setText("brandTagline", content.general.tagline);
@@ -142,6 +177,17 @@ function renderContent(content) {
   setLink("contactAddressLink", content.contact.mapLink);
   setLink("contactPhoneLink", `tel:${content.contact.phone}`);
   setLink("contactEmailLink", `mailto:${content.contact.email}`);
+  setLink("footerPhoneLink", `tel:${content.contact.phone}`, content.contact.phone);
+  setLink("footerEmailLink", `mailto:${content.contact.email}`, content.contact.email);
+  setLink("footerMapLink", content.contact.mapLink, "Manzilni ochish");
+  setLink("footerTelegramLink", content.contact.telegram, "Telegram");
+  setLink("footerInstagramLink", content.contact.instagram, "Instagram");
+
+  setText("footerOfficialLabel", content.footer?.officialLabel || "Rasmiy axborot platformasi");
+  setText("footerOfficialNote", content.footer?.officialNote || "");
+  setText("footerLegalText", content.footer?.legalText || "");
+
+  renderGovernmentOrganizations(content.governmentOrganizations || []);
 }
 
 function renderHeroSpotlights(items) {
@@ -152,7 +198,7 @@ function renderHeroSpotlights(items) {
       return `
         <article class="spotlight-card reveal">
           <strong data-counter="${parsed.number}" data-suffix="${parsed.suffix}">0</strong>
-          <span>${item.label}</span>
+          <span>${escapeHtml(item.label)}</span>
         </article>
       `;
     })
@@ -163,13 +209,13 @@ function renderHeroSpotlights(items) {
 
 function renderSimpleList(targetId, items) {
   const target = document.getElementById(targetId);
-  target.innerHTML = items.map((item) => `<div class="reveal">${item}</div>`).join("");
+  target.innerHTML = items.map((item) => `<div class="reveal">${escapeHtml(item)}</div>`).join("");
 }
 
 function renderFeatureList(items) {
   const target = document.getElementById("aboutFeatures");
   target.innerHTML = items
-    .map((item) => `<div class="feature-item reveal">${item}</div>`)
+    .map((item) => `<div class="feature-item reveal">${escapeHtml(item)}</div>`)
     .join("");
 }
 
@@ -179,9 +225,9 @@ function renderDirections(items) {
     .map(
       (item) => `
         <article class="info-card reveal">
-          <div class="card-icon">${item.icon}</div>
-          <h3>${item.title}</h3>
-          <p>${item.description}</p>
+          <div class="card-icon">${escapeHtml(item.icon)}</div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.description)}</p>
         </article>
       `
     )
@@ -196,9 +242,9 @@ function renderProjects(items) {
         <article class="project-card reveal ${item.featured ? "featured" : ""}">
           ${renderProjectMedia(item)}
           <div class="project-card-body">
-            <span class="project-category">${item.category}</span>
-            <h3>${item.title}</h3>
-            <p>${item.summary}</p>
+            <span class="project-category">${escapeHtml(item.category)}</span>
+            <h3>${escapeHtml(item.title)}</h3>
+            <p>${escapeHtml(item.summary)}</p>
           </div>
         </article>
       `
@@ -214,7 +260,7 @@ function renderMetrics(items) {
       return `
         <article class="metric-card reveal">
           <strong data-counter="${parsed.number}" data-suffix="${parsed.suffix}">0</strong>
-          <span>${item.label}</span>
+          <span>${escapeHtml(item.label)}</span>
         </article>
       `;
     })
@@ -229,10 +275,10 @@ function renderNews(items) {
     .map(
       (item) => `
         <article class="news-card reveal">
-          <span class="news-meta">${item.date}</span>
-          <h3>${item.title}</h3>
-          <p>${item.description}</p>
-          <a href="${item.link || "#"}">Batafsil</a>
+          <span class="news-meta">${escapeHtml(item.date)}</span>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.description)}</p>
+          <a href="${sanitizeHref(item.link, { allowHash: true, allowRelative: true })}">Batafsil</a>
         </article>
       `
     )
@@ -349,13 +395,13 @@ async function lookupApplicationStatus(deviceId, fromManualSubmit) {
           <article class="status-item">
             <div class="status-item-top">
               <div>
-                <strong>${item.trackingCode}</strong>
-                <span>${item.selectedProgram}</span>
+                <strong>${escapeHtml(item.trackingCode)}</strong>
+                <span>${escapeHtml(item.selectedProgram)}</span>
               </div>
               <span class="status-badge ${item.status}">${translateStatus(item.status)}</span>
             </div>
             <p>Yuborilgan sana: ${formatDate(item.createdAt)}</p>
-            <p>${item.adminNote ? `Admin izohi: ${item.adminNote}` : "Admin izohi hozircha kiritilmagan."}</p>
+            <p>${item.adminNote ? `Admin izohi: ${escapeHtml(item.adminNote)}` : "Admin izohi hozircha kiritilmagan."}</p>
           </article>
         `
       )
@@ -484,7 +530,7 @@ function setLink(id, href, text) {
   }
 
   if (href) {
-    element.href = href;
+    element.href = sanitizeHref(href, { allowHash: true, allowRelative: true });
   }
 
   if (text) {
@@ -524,29 +570,258 @@ function renderMedia(targetId, src, alt, mediaType = "image") {
     return;
   }
 
-  if (!src) {
+  const safeSrc = sanitizeMediaUrl(src);
+
+  if (!safeSrc) {
     target.innerHTML = "";
     return;
   }
 
-  const resolvedType = mediaType || inferMediaType(src);
+  const resolvedType = mediaType || inferMediaType(safeSrc);
 
   target.innerHTML =
     resolvedType === "video"
-      ? `<video src="${src}" autoplay muted loop playsinline controls></video>`
-      : `<img src="${src}" alt="${alt || ""}" />`;
+      ? `<video src="${safeSrc}" autoplay muted loop playsinline controls></video>`
+      : `<img src="${safeSrc}" alt="${escapeHtml(alt || "")}" />`;
 }
 
 function renderProjectMedia(item) {
-  const mediaType = item.mediaType || inferMediaType(item.image);
+  const safeSrc = sanitizeMediaUrl(item.image);
+  const mediaType = item.mediaType || inferMediaType(safeSrc);
 
-  if (mediaType === "video") {
-    return `<video class="project-card-video" src="${item.image}" controls muted playsinline preload="metadata"></video>`;
+  if (!safeSrc) {
+    return `<div class="project-card-image project-placeholder">${escapeHtml(item.title || "Media")}</div>`;
   }
 
-  return `<img class="project-card-image" src="${item.image}" alt="${item.title}" />`;
+  if (mediaType === "video") {
+    return `<video class="project-card-video" src="${safeSrc}" controls muted playsinline preload="metadata"></video>`;
+  }
+
+  return `<img class="project-card-image" src="${safeSrc}" alt="${escapeHtml(item.title)}" />`;
 }
 
 function inferMediaType(url) {
   return /\.(mp4|webm|ogg|mov)$/i.test(String(url || "")) ? "video" : "image";
+}
+
+function renderBrandAssets(general) {
+  const logoUrl = sanitizeMediaUrl(general.logo);
+  const initials = buildInitials(general.organizationShortName || general.organizationName);
+
+  renderLogoBlock("brandMark", "brandLogo", "brandInitials", logoUrl, initials);
+  renderLogoBlock("footerBrandMark", "footerLogo", "footerInitials", logoUrl, initials);
+  updateFavicon(logoUrl);
+}
+
+function renderLogoBlock(wrapperId, imageId, initialsId, logoUrl, initials) {
+  const wrapper = document.getElementById(wrapperId);
+  const image = document.getElementById(imageId);
+  const initialsNode = document.getElementById(initialsId);
+
+  if (!wrapper || !image || !initialsNode) {
+    return;
+  }
+
+  initialsNode.textContent = initials;
+
+  if (logoUrl) {
+    image.src = logoUrl;
+    image.hidden = false;
+    wrapper.classList.add("has-logo");
+    return;
+  }
+
+  image.hidden = true;
+  image.removeAttribute("src");
+  wrapper.classList.remove("has-logo");
+}
+
+function updateFavicon(logoUrl) {
+  const favicon = document.getElementById("siteFavicon");
+  const shortcutIcon = document.getElementById("siteShortcutIcon");
+  const appleTouch = document.getElementById("siteAppleTouch");
+  const nextUrl = sanitizeMediaUrl(logoUrl, { allowData: true }) || defaultFavicon;
+
+  if (favicon) {
+    favicon.href = nextUrl;
+  }
+
+  if (shortcutIcon) {
+    shortcutIcon.href = nextUrl;
+  }
+
+  if (appleTouch) {
+    appleTouch.href = nextUrl;
+  }
+}
+
+function updateSeoMeta(content) {
+  const image = sanitizeMediaUrl(content.general.logo || content.hero.image) || "";
+  updateMetaBySelector('meta[property="og:title"]', content.general.seoTitle || content.general.organizationName);
+  updateMetaBySelector('meta[property="og:site_name"]', content.general.organizationName);
+  updateMetaBySelector('meta[property="og:description"]', content.general.metaDescription);
+  updateMetaBySelector('meta[property="og:url"]', window.location.origin);
+  updateMetaBySelector('meta[property="og:image"]', image);
+  updateMetaBySelector('meta[name="twitter:title"]', content.general.seoTitle || content.general.organizationName);
+  updateMetaBySelector('meta[name="twitter:description"]', content.general.metaDescription);
+  updateMetaBySelector('meta[name="twitter:image"]', image);
+  const canonicalUrl = document.getElementById("canonicalUrl");
+
+  if (canonicalUrl) {
+    canonicalUrl.href = window.location.origin;
+  }
+
+  const schemaNode = document.getElementById("organizationSchema");
+
+  if (schemaNode) {
+    schemaNode.textContent = JSON.stringify(
+      {
+        "@context": "https://schema.org",
+        "@type": "GovernmentOrganization",
+        name: content.general.organizationName,
+        description: content.general.metaDescription,
+        logo: content.general.logo || undefined,
+        url: window.location.origin,
+        sameAs: (content.governmentOrganizations || []).map((item) => item.url).filter(Boolean),
+        contactPoint: [
+          {
+            "@type": "ContactPoint",
+            telephone: content.contact.phone,
+            email: content.contact.email,
+            contactType: "customer support"
+          }
+        ]
+      },
+      null,
+      2
+    );
+  }
+}
+
+function updateMetaBySelector(selector, value) {
+  const node = document.querySelector(selector);
+
+  if (node) {
+    node.setAttribute("content", value || "");
+  }
+}
+
+function renderGovernmentOrganizations(items) {
+  const desktop = document.getElementById("governmentDropdown");
+  const mobile = document.getElementById("mobileOrganizations");
+  const footer = document.getElementById("footerOrganizations");
+  const hasItems = items.length > 0;
+
+  const html = items
+    .map(
+      (item) => `
+        <a class="gov-link" href="${sanitizeHref(item.url)}" target="_blank" rel="noreferrer">
+          <strong>${escapeHtml(item.name)}</strong>
+          <span>${escapeHtml(item.description || "")}</span>
+        </a>
+      `
+    )
+    .join("");
+
+  const footerHtml = items
+    .map(
+      (item) => `
+        <a class="footer-org-card" href="${sanitizeHref(item.url)}" target="_blank" rel="noreferrer">
+          <strong>${escapeHtml(item.name)}</strong>
+          <span>${escapeHtml(item.description || "")}</span>
+        </a>
+      `
+    )
+    .join("");
+
+  if (govMenu) {
+    govMenu.hidden = !hasItems;
+  }
+
+  if (mobileOrgToggle) {
+    mobileOrgToggle.closest(".mobile-orgs").hidden = !hasItems;
+  }
+
+  if (desktop) {
+    desktop.innerHTML = html;
+  }
+
+  if (mobile) {
+    mobile.innerHTML = html;
+  }
+
+  if (footer) {
+    footer.innerHTML = footerHtml;
+  }
+}
+
+function buildInitials(text) {
+  return String(text || "QY")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function sanitizeHref(value, options = {}) {
+  const {
+    allowHash = false,
+    allowRelative = false
+  } = options;
+
+  const input = String(value || "").trim();
+
+  if (!input) {
+    return "#";
+  }
+
+  if (allowHash && input.startsWith("#")) {
+    return input;
+  }
+
+  if (allowRelative && input.startsWith("/")) {
+    return input;
+  }
+
+  if (/^(mailto:|tel:)/i.test(input)) {
+    return input;
+  }
+
+  try {
+    const parsed = new URL(input, window.location.origin);
+    return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "#";
+  } catch (error) {
+    return "#";
+  }
+}
+
+function sanitizeMediaUrl(value, options = {}) {
+  const { allowData = false } = options;
+  const input = String(value || "").trim();
+
+  if (!input) {
+    return "";
+  }
+
+  if (allowData && /^data:image\//i.test(input)) {
+    return input;
+  }
+
+  try {
+    const parsed = new URL(input, window.location.origin);
+    return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+  } catch (error) {
+    return "";
+  }
 }

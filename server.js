@@ -43,16 +43,21 @@ const DEFAULT_SITE_CONTENT = {
   general: {
     organizationName: "Qarshi Yoshlar Texnoparki",
     organizationShortName: "Qarshi Texnopark",
-    tagline: "Innovatsiya, ta'lim va startaplarni birlashtiruvchi zamonaviy markaz",
+    logo: "",
+    logoType: "image",
+    tagline: "Yoshlar, startaplar va raqamli loyihalar uchun rasmiy innovatsion platforma",
+    seoTitle: "Qarshi Yoshlar Texnoparki | Rasmiy IT ta'lim, startap va innovatsiya platformasi",
+    seoKeywords:
+      "qarshi texnopark, yoshlar texnoparki, rasmiy texnopark sayti, it ta'lim, startup, robototexnika, innovatsiya, qarshi",
     metaDescription:
-      "Qarshi Yoshlar Texnoparki uchun premium light dizayndagi rasmiy platforma. Uchrashuv belgilash, ariza topshirish va device ID orqali natijani ko'rish funksiyalari bilan."
+      "Qarshi Yoshlar Texnoparki uchun rasmiy platforma: yo'nalishlar, loyihalar, uchrashuv belgilash, ariza topshirish va device ID orqali natijani kuzatish imkoniyati."
   },
   hero: {
     eyebrow: "Qashqadaryo yoshlariga yangi avlod texnoparki",
     title: "Kelajak kasblari, startaplar va innovatsiyalar uchun premium raqamli makon",
     highlight: "ta'lim, mentorlik va real loyihalar",
     description:
-      "Qarshi Yoshlar Texnoparki yoshlar, hamkorlar va investorlar uchun yagona raqamli kirish nuqtasi bo'lib, ariza, uchrashuv va axborot boshqaruvini birlashtiradi.",
+      "Qarshi Yoshlar Texnoparki yoshlar, hamkor tashkilotlar va investorlar uchun yagona rasmiy raqamli kirish nuqtasi bo'lib, dasturlar, arizalar, uchrashuvlar va media axborotni bitta makonda birlashtiradi.",
     primaryActionLabel: "Ariza topshirish",
     primaryActionLink: "#application",
     secondaryActionLabel: "Uchrashuv belgilash",
@@ -67,6 +72,7 @@ const DEFAULT_SITE_CONTENT = {
   trustItems: [
     "Rasmiy va premium taqdimot",
     "Device ID asosida natijani ko'rish",
+    "Logo va favicon bilan brend boshqaruvi",
     "Admin uchun to'liq kontent boshqaruvi",
     "MongoDB bilan markazlashgan ma'lumotlar",
     "Cloudinary orqali media boshqaruvi"
@@ -78,7 +84,7 @@ const DEFAULT_SITE_CONTENT = {
     },
     {
       value: "1500+",
-      label: "qamrab olinadigan yoshlar"
+      label: "qamrab olinadigan yoshlar va talabgorlar"
     },
     {
       value: "24/7",
@@ -89,7 +95,7 @@ const DEFAULT_SITE_CONTENT = {
     tag: "Markaz haqida",
     title: "Yoshlar salohiyatini texnologiya, kreativ sanoat va amaliy mentorlik bilan birlashtiruvchi platforma",
     description:
-      "Mazkur sayt rasmiy ishonchlilikni zamonaviy premium ko'rinish bilan uyg'unlashtiradi. Har bir bo'lim admin panel orqali yangilanadi, foydalanuvchilar esa ro'yxatdan o'tmasdan qurilma ID yordamida o'z ariza natijasini kuzata oladi.",
+      "Mazkur sayt rasmiy ishonchlilikni zamonaviy premium ko'rinish bilan uyg'unlashtiradi. Har bir bo'lim admin panel orqali yangilanadi, foydalanuvchilar esa ro'yxatdan o'tmasdan qurilma ID yordamida o'z ariza natijasini kuzata oladi, hamkorlar esa rasmiy aloqalar va davlat tashkilotlari bilan tez bog'lana oladi.",
     imageA:
       "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
     imageAType: "image",
@@ -264,6 +270,40 @@ const DEFAULT_SITE_CONTENT = {
     mapLink: "https://maps.google.com",
     telegram: "https://t.me/qarshiyoshlortexnopark",
     instagram: "https://instagram.com/qarshiyoshlortexnopark"
+  },
+  governmentOrganizations: [
+    {
+      name: "Qashqadaryo viloyati hokimligi",
+      url: "https://qashqadaryo.uz",
+      description: "Hududiy rivojlanish va hamkorlik bo'yicha rasmiy tashkilot."
+    },
+    {
+      name: "Yoshlar ishlari agentligi",
+      url: "https://yoshlar.gov.uz",
+      description: "Yoshlar siyosati va iqtidorli tashabbuslarni qo'llab-quvvatlash."
+    },
+    {
+      name: "Raqamli texnologiyalar vazirligi",
+      url: "https://digital.uz",
+      description: "Raqamli transformatsiya va IT ekotizimini rivojlantirish bo'yicha rasmiy hamkor."
+    },
+    {
+      name: "Oliy ta'lim, fan va innovatsiyalar vazirligi",
+      url: "https://edu.uz",
+      description: "Ta'lim, ilmiy rivojlanish va innovatsion tashabbuslar bo'yicha rasmiy yo'nalish."
+    },
+    {
+      name: "IT Park Uzbekistan",
+      url: "https://it-park.uz",
+      description: "IT ekotizimi, startaplar va rezident loyihalarni rivojlantirish bo'yicha hamkor platforma."
+    }
+  ],
+  footer: {
+    officialLabel: "Rasmiy axborot platformasi",
+    officialNote:
+      "Mazkur veb-sayt Qarshi Yoshlar Texnoparki faoliyati, dasturlari, imkoniyatlari, ariza va uchrashuv oqimlari bo'yicha rasmiy raqamli axborot manbasi sifatida xizmat qiladi.",
+    legalText:
+      "Saytdagi ma'lumotlar muntazam yangilanadi. Hamkorlik, dasturlarga qo'shilish va rasmiy murojaatlar bo'yicha yuqoridagi rasmiy kanallardan foydalanish tavsiya etiladi."
   }
 };
 

@@ -293,7 +293,8 @@ h4 {
   grid-column: 1 / -1;
 }
 
-.hidden-helper-field {
+.hidden-helper-field,
+.legacy-field {
   display: none !important;
 }
 

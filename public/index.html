@@ -6,8 +6,39 @@
   <title>Qarshi Yoshlar Texnoparki</title>
   <meta
     name="description"
-    content="Qarshi Yoshlar Texnoparki uchun premium light dizayndagi rasmiy platforma."
+    content="Qarshi Yoshlar Texnoparki uchun rasmiy platforma: dasturlar, uchrashuvlar, arizalar va device ID orqali natijani kuzatish imkoniyati."
   />
+  <meta
+    name="keywords"
+    content="qarshi texnopark, yoshlar texnoparki, it ta'lim, startup, robototexnika, innovatsiya"
+  />
+  <meta name="application-name" content="Qarshi Yoshlar Texnoparki" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Qarshi Yoshlar Texnoparki" />
+  <meta property="og:site_name" content="Qarshi Yoshlar Texnoparki" />
+  <meta property="og:description" content="Qarshi Yoshlar Texnoparki uchun rasmiy platforma: dasturlar, uchrashuvlar, arizalar va device ID orqali natijani kuzatish imkoniyati." />
+  <meta property="og:url" content="/" />
+  <meta property="og:image" content="" />
+  <meta property="og:locale" content="uz_UZ" />
+  <link rel="canonical" id="canonicalUrl" href="/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Qarshi Yoshlar Texnoparki" />
+  <meta name="twitter:description" content="Qarshi Yoshlar Texnoparki uchun rasmiy platforma: dasturlar, uchrashuvlar, arizalar va device ID orqali natijani kuzatish imkoniyati." />
+  <meta name="twitter:image" content="" />
+  <meta name="theme-color" content="#f5f9ff" />
+  <link
+    id="siteFavicon"
+    rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f80ff'/%3E%3Ctext x='50%25' y='56%25' font-size='28' text-anchor='middle' fill='white' font-family='Arial'%3EQY%3C/text%3E%3C/svg%3E"
+  />
+  <link
+    id="siteShortcutIcon"
+    rel="shortcut icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f80ff'/%3E%3Ctext x='50%25' y='56%25' font-size='28' text-anchor='middle' fill='white' font-family='Arial'%3EQY%3C/text%3E%3C/svg%3E"
+  />
+  <link id="siteAppleTouch" rel="apple-touch-icon" href="" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -15,6 +46,13 @@
     rel="stylesheet"
   />
   <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json" id="organizationSchema">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Qarshi Yoshlar Texnoparki"
+    }
+  </script>
 </head>
 <body>
   <div class="ambient ambient-a"></div>
@@ -23,7 +61,10 @@
   <header class="site-header">
     <div class="container nav-shell">
       <a href="#home" class="brand">
-        <div class="brand-mark">QY</div>
+        <div class="brand-mark" id="brandMark">
+          <img id="brandLogo" alt="Qarshi Yoshlar Texnoparki logotipi" hidden />
+          <span id="brandInitials">QY</span>
+        </div>
         <div>
           <strong id="brandName">Qarshi Yoshlar Texnoparki</strong>
           <span id="brandTagline">Innovatsiya, ta'lim va startaplar markazi</span>
@@ -36,6 +77,12 @@
         <a href="#projects">Loyihalar</a>
         <a href="#meeting">Uchrashuv</a>
         <a href="#application">Ariza</a>
+        <div class="gov-menu" id="govMenu">
+          <button class="gov-trigger" id="govMenuToggle" type="button">
+            Davlat tashkilotlari
+          </button>
+          <div class="gov-dropdown" id="governmentDropdown"></div>
+        </div>
       </nav>
 
       <div class="nav-actions">
@@ -54,6 +101,12 @@
       <a href="#projects">Loyihalar</a>
       <a href="#meeting">Uchrashuv</a>
       <a href="#application">Ariza</a>
+      <div class="mobile-orgs">
+        <button class="mobile-org-toggle" id="mobileOrgToggle" type="button">
+          Davlat tashkilotlari
+        </button>
+        <div class="mobile-org-list" id="mobileOrganizations"></div>
+      </div>
     </div>
   </header>
 
@@ -267,17 +320,53 @@
   </main>
 
   <footer class="site-footer">
-    <div class="container footer-row">
-      <div>
-        <strong id="footerName">Qarshi Yoshlar Texnoparki</strong>
-        <p id="footerText">Premium light dizayndagi rasmiy platforma.</p>
+    <div class="container footer-shell">
+      <div class="footer-brand">
+        <div class="footer-brand-top">
+          <div class="brand-mark footer-brand-mark" id="footerBrandMark">
+            <img id="footerLogo" alt="Qarshi Yoshlar Texnoparki logotipi" hidden />
+            <span id="footerInitials">QY</span>
+          </div>
+          <div>
+            <strong id="footerName">Qarshi Yoshlar Texnoparki</strong>
+            <p id="footerText">Premium light dizayndagi rasmiy platforma.</p>
+          </div>
+        </div>
+        <span class="footer-pill" id="footerOfficialLabel">Rasmiy axborot platformasi</span>
+        <p class="footer-official-note" id="footerOfficialNote"></p>
       </div>
-      <div class="footer-links">
-        <a href="#directions">Yo'nalishlar</a>
-        <a href="#meeting">Uchrashuv</a>
-        <a href="#application">Ariza</a>
-        <a href="#status">Natija</a>
+
+      <div class="footer-column">
+        <h3>Asosiy bo'limlar</h3>
+        <div class="footer-links">
+          <a href="#about">Markaz haqida</a>
+          <a href="#directions">Yo'nalishlar</a>
+          <a href="#projects">Loyihalar</a>
+          <a href="#meeting">Uchrashuv</a>
+          <a href="#application">Ariza</a>
+          <a href="#status">Natijalar</a>
+        </div>
       </div>
+
+      <div class="footer-column footer-org-column">
+        <h3>Davlat tashkilotlari</h3>
+        <div class="footer-org-list" id="footerOrganizations"></div>
+      </div>
+
+      <div class="footer-column">
+        <h3>Rasmiy aloqa</h3>
+        <div class="footer-links footer-contacts">
+          <a id="footerPhoneLink" href="#">Telefon</a>
+          <a id="footerEmailLink" href="#">Email</a>
+          <a id="footerMapLink" href="#" target="_blank" rel="noreferrer">Manzil</a>
+          <a id="footerTelegramLink" href="#" target="_blank" rel="noreferrer">Telegram</a>
+          <a id="footerInstagramLink" href="#" target="_blank" rel="noreferrer">Instagram</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <p id="footerLegalText"></p>
     </div>
   </footer>
 
