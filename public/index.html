@@ -558,6 +558,54 @@
     <a class="quick-dock-link" href="#status">Status</a>
   </div>
 
+  <button class="chat-launcher" id="chatLauncher" type="button" aria-expanded="false" aria-controls="chatWidget">
+    <span class="chat-launcher-pulse" aria-hidden="true"></span>
+    <span class="chat-launcher-copy">
+      <strong>Aziz online</strong>
+      <small>HALLAYM AI yordamchi</small>
+    </span>
+  </button>
+
+  <div class="chatbot-shell" id="chatWidget" aria-hidden="true">
+    <button class="chatbot-backdrop" id="chatBackdrop" type="button" tabindex="-1" aria-label="Chatni yopish"></button>
+
+    <section class="chatbot-modal" role="dialog" aria-labelledby="chatTitle" aria-modal="false">
+      <header class="chatbot-header">
+        <div class="chatbot-identity">
+          <div class="chatbot-avatar">AZ</div>
+          <div class="chatbot-meta">
+            <strong id="chatTitle">Aziz online</strong>
+            <span>HALLAYM AI orqali tezkor yordam</span>
+          </div>
+        </div>
+        <div class="chatbot-header-actions">
+          <span class="chatbot-badge">Online</span>
+          <button class="chatbot-close" id="chatCloseBtn" type="button" aria-label="Chatni yopish">+</button>
+        </div>
+      </header>
+
+      <div class="chatbot-suggestions" id="chatSuggestions">
+        <button class="chat-suggestion" type="button" data-chat-prompt="Ariza topshirish qanday ishlaydi?">Ariza</button>
+        <button class="chat-suggestion" type="button" data-chat-prompt="Uchrashuv qanday belgilayman?">Uchrashuv</button>
+        <button class="chat-suggestion" type="button" data-chat-prompt="Device ID orqali natijani qanday ko'raman?">Status</button>
+      </div>
+
+      <div class="chatbot-messages" id="chatMessages"></div>
+
+      <form class="chatbot-form" id="chatForm">
+        <label class="sr-only" for="chatInput">Aziz online ga yozing</label>
+        <textarea
+          id="chatInput"
+          rows="1"
+          maxlength="800"
+          placeholder="Savolingizni yozing..."
+          autocomplete="off"
+        ></textarea>
+        <button class="chatbot-send" id="chatSendBtn" type="submit">Yuborish</button>
+      </form>
+    </section>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>

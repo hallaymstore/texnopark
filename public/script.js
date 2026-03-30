@@ -4,7 +4,10 @@ const state = {
   theme: document.documentElement.dataset.theme || "light",
   directionFilter: "all",
   faqQuery: "",
-  previewMode: false
+  previewMode: false,
+  chatMessages: [],
+  chatOpen: false,
+  chatPending: false
 };
 
 const pageLoader = document.getElementById("pageLoader");
@@ -26,6 +29,15 @@ const insightTicker = document.getElementById("insightTicker");
 const programCloud = document.getElementById("programCloud");
 const heroFloatStack = document.getElementById("heroFloatStack");
 const programFilters = document.getElementById("programFilters");
+const chatLauncher = document.getElementById("chatLauncher");
+const chatWidget = document.getElementById("chatWidget");
+const chatBackdrop = document.getElementById("chatBackdrop");
+const chatCloseBtn = document.getElementById("chatCloseBtn");
+const chatSuggestions = document.getElementById("chatSuggestions");
+const chatMessages = document.getElementById("chatMessages");
+const chatForm = document.getElementById("chatForm");
+const chatInput = document.getElementById("chatInput");
+const chatSendBtn = document.getElementById("chatSendBtn");
 const meetingForm = document.getElementById("meetingForm");
 const applicationForm = document.getElementById("applicationForm");
 const statusForm = document.getElementById("statusForm");
@@ -41,11 +53,13 @@ const systemThemeQuery =
     : null;
 const defaultFavicon =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f80ff'/%3E%3Ctext x='50%25' y='56%25' font-size='28' text-anchor='middle' fill='white' font-family='Arial'%3EQY%3C/text%3E%3C/svg%3E";
+const CHAT_STORAGE_KEY = "qyt_chat_messages";
 
 window.addEventListener("message", handlePreviewMessage);
 
 document.addEventListener("DOMContentLoaded", async () => {
   initializeTheme();
+  initializeChatWidget();
   deviceIdLabel.textContent = state.deviceId;
   statusInput.value = state.deviceId;
   meetingDateInput.min = new Date().toISOString().slice(0, 10);
@@ -117,6 +131,61 @@ function bindUi() {
       mobileOrganizations.classList.toggle("open");
     });
   }
+
+  if (chatLauncher) {
+    chatLauncher.addEventListener("click", () => {
+      setChatOpen(!state.chatOpen);
+    });
+  }
+
+  if (chatCloseBtn) {
+    chatCloseBtn.addEventListener("click", () => {
+      setChatOpen(false);
+    });
+  }
+
+  if (chatBackdrop) {
+    chatBackdrop.addEventListener("click", () => {
+      setChatOpen(false);
+    });
+  }
+
+  if (chatSuggestions) {
+    chatSuggestions.addEventListener("click", (event) => {
+      const trigger = event.target.closest("[data-chat-prompt]");
+
+      if (!trigger || state.chatPending) {
+        return;
+      }
+
+      sendChatMessage(trigger.dataset.chatPrompt || "");
+    });
+  }
+
+  if (chatForm) {
+    chatForm.addEventListener("submit", handleChatSubmit);
+  }
+
+  if (chatInput) {
+    resizeChatInput();
+
+    chatInput.addEventListener("input", () => {
+      resizeChatInput();
+    });
+
+    chatInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        chatForm?.requestSubmit();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.chatOpen) {
+      setChatOpen(false);
+    }
+  });
 
   mobileMenu.addEventListener("click", (event) => {
     if (event.target.closest("a")) {
@@ -283,6 +352,7 @@ function renderContent(content) {
   renderPartners(content.partnersSection || {});
 
   renderGovernmentOrganizations(content.governmentOrganizations || []);
+  hydrateChatContext(content);
 
   if (faqSearchInput && document.activeElement !== faqSearchInput) {
     faqSearchInput.value = state.faqQuery;
@@ -843,6 +913,227 @@ function renderLiveStatus(section) {
           <strong>Faol</strong>
         </article>
       `;
+}
+
+function initializeChatWidget() {
+  state.chatMessages = readStoredChatMessages();
+
+  if (!state.chatMessages.length) {
+    state.chatMessages = [buildChatSeedMessage()];
+  }
+
+  renderChatMessages();
+  setChatOpen(false);
+}
+
+function hydrateChatContext(content) {
+  if (!content) {
+    return;
+  }
+
+  const firstMessage = state.chatMessages[0];
+
+  if (!firstMessage || !firstMessage.seed) {
+    return;
+  }
+
+  state.chatMessages[0] = buildChatSeedMessage(content);
+  persistChatMessages();
+  renderChatMessages();
+}
+
+function buildChatSeedMessage(content = state.content) {
+  const name = content?.general?.organizationName || "Qarshi Yoshlar Texnoparki";
+
+  return {
+    role: "assistant",
+    seed: true,
+    content: `Assalomu alaykum. Men Aziz online, ${name} uchun HALLAYM AI yordamchisiman. Ariza, uchrashuv, yo'nalishlar va Device ID statusi bo'yicha tezkor yordam beraman.`
+  };
+}
+
+function setChatOpen(nextState) {
+  state.chatOpen = Boolean(nextState);
+
+  if (chatWidget) {
+    chatWidget.classList.toggle("is-open", state.chatOpen);
+    chatWidget.setAttribute("aria-hidden", state.chatOpen ? "false" : "true");
+  }
+
+  if (chatLauncher) {
+    chatLauncher.setAttribute("aria-expanded", state.chatOpen ? "true" : "false");
+  }
+
+  if (state.chatOpen) {
+    window.setTimeout(() => {
+      chatInput?.focus();
+      scrollChatToBottom();
+    }, 80);
+  }
+}
+
+function renderChatMessages() {
+  if (!chatMessages) {
+    return;
+  }
+
+  const transcript = state.chatMessages
+    .map(
+      (message) => `
+        <article class="chat-message ${message.role === "user" ? "is-user" : "is-bot"}">
+          <span class="chat-message-role">${message.role === "user" ? "Siz" : "Aziz online"}</span>
+          <div class="chat-bubble">${formatChatMessage(message.content)}</div>
+        </article>
+      `
+    )
+    .join("");
+
+  const typingHtml = state.chatPending
+    ? `
+      <article class="chat-message is-bot">
+        <span class="chat-message-role">Aziz online</span>
+        <div class="chat-bubble">
+          <span class="chat-typing" aria-label="Yozmoqda">
+            <span class="chat-typing-dot"></span>
+            <span class="chat-typing-dot"></span>
+            <span class="chat-typing-dot"></span>
+          </span>
+        </div>
+      </article>
+    `
+    : "";
+
+  chatMessages.innerHTML = transcript + typingHtml;
+
+  if (chatSendBtn) {
+    chatSendBtn.disabled = state.chatPending;
+    chatSendBtn.textContent = state.chatPending ? "Kutilyapti..." : "Yuborish";
+  }
+
+  if (chatInput) {
+    chatInput.disabled = state.chatPending;
+  }
+
+  if (chatSuggestions) {
+    chatSuggestions.hidden = state.chatMessages.length > 2;
+  }
+
+  scrollChatToBottom();
+}
+
+function formatChatMessage(value) {
+  return escapeHtml(value || "").replaceAll("\n", "<br />");
+}
+
+function scrollChatToBottom() {
+  if (!chatMessages) {
+    return;
+  }
+
+  window.requestAnimationFrame(() => {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+}
+
+function resizeChatInput() {
+  if (!chatInput) {
+    return;
+  }
+
+  chatInput.style.height = "auto";
+  chatInput.style.height = `${Math.min(chatInput.scrollHeight, 148)}px`;
+}
+
+function readStoredChatMessages() {
+  try {
+    const raw = sessionStorage.getItem(CHAT_STORAGE_KEY);
+    const parsed = JSON.parse(raw || "[]");
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed
+      .filter((item) => item && (item.role === "user" || item.role === "assistant"))
+      .slice(-14)
+      .map((item) => ({
+        role: item.role,
+        content: String(item.content || "").slice(0, 1800),
+        ...(item.seed ? { seed: true } : {})
+      }))
+      .filter((item) => item.content);
+  } catch (error) {
+    return [];
+  }
+}
+
+function persistChatMessages() {
+  try {
+    sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(state.chatMessages.slice(-14)));
+  } catch (error) {
+    // Ignore storage issues for chat history.
+  }
+}
+
+async function handleChatSubmit(event) {
+  event.preventDefault();
+  await sendChatMessage(chatInput ? chatInput.value : "");
+}
+
+async function sendChatMessage(rawMessage) {
+  const message = String(rawMessage || "").trim();
+
+  if (!message || state.chatPending) {
+    return;
+  }
+
+  setChatOpen(true);
+  state.chatPending = true;
+  state.chatMessages.push({
+    role: "user",
+    content: message
+  });
+  state.chatMessages = state.chatMessages.slice(-14);
+  persistChatMessages();
+  renderChatMessages();
+
+  if (chatInput) {
+    chatInput.value = "";
+    resizeChatInput();
+  }
+
+  try {
+    const response = await fetch("/api/assistant/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        messages: state.chatMessages.slice(-10)
+      })
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new Error(payload.message || "Aziz online hozir javob bera olmadi.");
+    }
+
+    state.chatMessages.push({
+      role: "assistant",
+      content: payload.data?.reply || "Hozircha javob shakllanmadi."
+    });
+  } catch (error) {
+    state.chatMessages.push({
+      role: "assistant",
+      content: error.message || "Hozircha ulanishda muammo bor. Keyinroq qayta urinib ko'ring."
+    });
+  } finally {
+    state.chatPending = false;
+    state.chatMessages = state.chatMessages.slice(-14);
+    persistChatMessages();
+    renderChatMessages();
+  }
 }
 
 function renderProjects(items) {

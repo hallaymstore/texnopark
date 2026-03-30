@@ -15,6 +15,8 @@ const PORT = Number(process.env.PORT) || 4000;
 const ROOT_DIR = __dirname;
 const PUBLIC_DIR = path.join(ROOT_DIR, "public");
 const ADMIN_DIR = path.join(ROOT_DIR, "admin");
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 const ADMIN_COOKIE_NAME = "qyt_admin_session";
 const ADMIN_SLUG = (process.env.ADMIN_SLUG || "ef3190c0fee63c12").trim();
 const ADMIN_ROUTE = `/${ADMIN_SLUG}`;
@@ -632,6 +634,27 @@ app.get("/api/site-content", async (req, res, next) => {
   }
 });
 
+app.post("/api/assistant/chat", async (req, res, next) => {
+  try {
+    const messages = normalizeChatMessages(req.body.messages);
+
+    if (!messages.length) {
+      return res.status(400).json({
+        message: "Kamida bitta xabar yuborilishi kerak."
+      });
+    }
+
+    const content = await getSiteContent();
+    const result = await generateAssistantReply(messages, content);
+
+    res.json({
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.post("/api/appointments", async (req, res, next) => {
   try {
     const payload = {
@@ -996,6 +1019,146 @@ function clearLoginAttempts(ip) {
 
 function cleanText(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
+}
+
+function normalizeChatMessages(messages) {
+  if (!Array.isArray(messages)) {
+    return [];
+  }
+
+  return messages
+    .filter((item) => item && (item.role === "user" || item.role === "assistant"))
+    .slice(-10)
+    .map((item) => ({
+      role: item.role,
+      content: cleanText(item.content, 1800)
+    }))
+    .filter((item) => item.content);
+}
+
+function buildSiteAssistantPrompt(content) {
+  const directions = (content.directions?.items || [])
+    .map((item) => `${item.title}${item.category ? ` (${item.category})` : ""}: ${item.description}`)
+    .join("; ");
+  const applicationOptions = (content.applicationSection?.applicationOptions || []).join(", ");
+  const meetingTypes = (content.appointmentSection?.meetingTypes || []).join(", ");
+  const timeline = (content.timelineSection?.items || [])
+    .map((item) => `${item.step}. ${item.title} - ${item.description}`)
+    .join("; ");
+  const faq = (content.faqSection?.items || [])
+    .slice(0, 6)
+    .map((item) => `Savol: ${item.question} Javob: ${item.answer}`)
+    .join("; ");
+
+  return [
+    `You are Aziz online, the public-facing HALLAYM AI assistant for ${content.general.organizationName}.`,
+    "Always reply in Uzbek Latin unless the user clearly uses another language.",
+    "Be warm, concise, practical and speak like a real helpful human assistant.",
+    "Only use the public website information provided below. Do not invent admissions rules, fees or guarantees.",
+    "If the user wants to submit something, guide them to the relevant website section instead of claiming you submitted it.",
+    "Mention Device ID when users ask about application results or tracking.",
+    `Organization tagline: ${content.general.tagline}.`,
+    `Hero summary: ${content.hero.description}.`,
+    `Directions: ${directions || "Yo'nalishlar tez orada yangilanadi."}`,
+    `Application options: ${applicationOptions || "Admin panel orqali boshqariladi."}`,
+    `Meeting types: ${meetingTypes || "Admin panel orqali boshqariladi."}`,
+    `Timeline: ${timeline || "Bosqichlar admin panel orqali yangilanadi."}`,
+    `FAQ: ${faq || "FAQ ma'lumotlari admin panel orqali yangilanadi."}`,
+    `Contact: address ${content.contact.address}; phone ${content.contact.phone}; email ${content.contact.email}; working hours ${content.contact.workingHours}.`,
+    "Keep answers compact, typically 2-5 sentences, and end with a concrete next step when useful."
+  ].join("\n");
+}
+
+function buildFallbackAssistantReply(userMessage, content) {
+  const query = String(userMessage || "").toLowerCase();
+  const directionList = (content.directions?.items || []).map((item) => item.title).filter(Boolean);
+
+  if (query.includes("status") || query.includes("natija") || query.includes("device")) {
+    return `${content.statusSection.title}. ${content.statusSection.description} ${content.statusSection.helperText}`;
+  }
+
+  if (query.includes("uchrashuv") || query.includes("meeting") || query.includes("suhbat")) {
+    return `${content.appointmentSection.title}. ${content.appointmentSection.description} Mavjud formatlar: ${(content.appointmentSection.meetingTypes || []).join(", ")}.`;
+  }
+
+  if (query.includes("ariza") || query.includes("topshir")) {
+    return `${content.applicationSection.title}. ${content.applicationSection.description} Mavjud yo'nalishlar: ${(content.applicationSection.applicationOptions || []).join(", ")}.`;
+  }
+
+  if (query.includes("yo'nalish") || query.includes("dastur") || query.includes("kurs")) {
+    return directionList.length
+      ? `Asosiy yo'nalishlar: ${directionList.join(", ")}. Batafsil tavsiflar "Yo'nalishlar" bo'limida berilgan.`
+      : "Yo'nalishlar bo'limi admin panel orqali boshqariladi va public sahifada ko'rsatiladi.";
+  }
+
+  if (query.includes("aloqa") || query.includes("telefon") || query.includes("manzil") || query.includes("email")) {
+    return `Aloqa uchun telefon: ${content.contact.phone}, email: ${content.contact.email}, manzil: ${content.contact.address}. Ish vaqti: ${content.contact.workingHours}.`;
+  }
+
+  return `Assalomu alaykum. Men Aziz online. Sizga ariza, uchrashuv, yo'nalishlar va Device ID bo'yicha yordam bera olaman. Zarur bo'lsa aloqa ma'lumotlari: ${content.contact.phone}, ${content.contact.email}.`;
+}
+
+async function generateAssistantReply(messages, content) {
+  const lastUserMessage = [...messages].reverse().find((item) => item.role === "user")?.content || "";
+  const fallbackReply = buildFallbackAssistantReply(lastUserMessage, content);
+  const apiKey = cleanText(process.env.GROQ_API_KEY, 240);
+
+  if (!apiKey) {
+    return {
+      reply: fallbackReply,
+      mode: "fallback"
+    };
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+
+  try {
+    const response = await fetch(GROQ_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        temperature: 0.4,
+        max_tokens: 420,
+        messages: [
+          {
+            role: "system",
+            content: buildSiteAssistantPrompt(content)
+          },
+          ...messages
+        ]
+      }),
+      signal: controller.signal
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(payload?.error?.message || "Groq javobi olinmadi.");
+    }
+
+    const reply = cleanText(payload?.choices?.[0]?.message?.content, 5000);
+
+    if (!reply) {
+      throw new Error("Bo'sh javob qaytdi.");
+    }
+
+    return {
+      reply,
+      mode: "groq"
+    };
+  } catch (error) {
+    return {
+      reply: fallbackReply,
+      mode: "fallback"
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function createSignedSession(username) {
