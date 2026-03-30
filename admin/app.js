@@ -4,7 +4,8 @@ const state = {
   applications: [],
   appointments: [],
   editorData: {},
-  pendingUploads: 0
+  pendingUploads: 0,
+  previewSyncTimer: null
 };
 
 const authView = document.getElementById("authView");
@@ -16,6 +17,8 @@ const refreshBtn = document.getElementById("refreshBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const applicationsList = document.getElementById("applicationsList");
 const appointmentsList = document.getElementById("appointmentsList");
+const previewFrame = document.getElementById("previewFrame");
+const previewStatus = document.getElementById("previewStatus");
 
 const editorConfigs = [
   {
@@ -50,9 +53,10 @@ const editorConfigs = [
     title: "Yo'nalishlar",
     description: "Har bir yo'nalishni oddiy kartalar ko'rinishida to'ldiring.",
     addLabel: "Yo'nalish qo'shish",
-    createItem: () => ({ icon: "", title: "", description: "" }),
+    createItem: () => ({ icon: "", category: "", title: "", description: "" }),
     fields: [
       { key: "icon", label: "Qisqa belgi", placeholder: "AI" },
+      { key: "category", label: "Kategoriya", placeholder: "Digital" },
       { key: "title", label: "Sarlavha", placeholder: "Sun'iy intellekt va dasturlash" },
       { key: "description", label: "Tavsif", type: "textarea", placeholder: "Qisqa tavsif" }
     ]
@@ -88,6 +92,19 @@ const editorConfigs = [
     ]
   },
   {
+    name: "timelineSection.items",
+    title: "Timeline bosqichlari",
+    description: "Qabul va onboarding bosqichlarini shu yerdan kiriting.",
+    addLabel: "Bosqich qo'shish",
+    createItem: () => ({ step: "", title: "", description: "", state: "upcoming" }),
+    fields: [
+      { key: "step", label: "Bosqich kodi", placeholder: "01" },
+      { key: "title", label: "Sarlavha", placeholder: "Ariza yuborish" },
+      { key: "description", label: "Tavsif", type: "textarea", placeholder: "Bosqich tafsiloti" },
+      { key: "state", label: "Holat", placeholder: "active / upcoming / complete" }
+    ]
+  },
+  {
     name: "news.items",
     title: "Yangiliklar",
     description: "Yangilik kartalarini shu yerdan boshqaring.",
@@ -99,6 +116,25 @@ const editorConfigs = [
       { key: "description", label: "Tavsif", type: "textarea", placeholder: "Qisqa tavsif" },
       { key: "link", label: "Tugma linki", placeholder: "#application" }
     ]
+  },
+  {
+    name: "testimonialsSection.items",
+    title: "Testimonials",
+    description: "Fikrlar, muvaffaqiyat hikoyalari va rezidentlar sharhlarini kiriting.",
+    addLabel: "Fikr qo'shish",
+    createItem: () => ({ name: "", role: "", quote: "", result: "", image: "", imageType: "image" }),
+    fields: [
+      { key: "name", label: "Ism", placeholder: "Shahzod Xudoyberdiyev" },
+      { key: "role", label: "Rol", placeholder: "AI yo'nalishi rezidenti" },
+      { key: "quote", label: "Fikr", type: "textarea", placeholder: "Qisqa sharh" },
+      { key: "result", label: "Natija", placeholder: "Dasturga qabul qilingan" }
+    ],
+    media: {
+      urlKey: "image",
+      typeKey: "imageType",
+      accept: "image/*",
+      label: "Avatar rasmi"
+    }
   },
   {
     name: "appointmentSection.meetingTypes",
@@ -115,6 +151,47 @@ const editorConfigs = [
     addLabel: "Yo'nalish qo'shish",
     createItem: () => "",
     fields: [{ key: "__self", label: "Yo'nalish", placeholder: "Sun'iy intellekt va dasturlash" }]
+  },
+  {
+    name: "faqSection.items",
+    title: "FAQ savollar",
+    description: "Qidiruvli FAQ uchun savol-javob juftliklarini kiriting.",
+    addLabel: "Savol qo'shish",
+    createItem: () => ({ question: "", answer: "" }),
+    fields: [
+      { key: "question", label: "Savol", placeholder: "Ariza topshirish qanday ishlaydi?" },
+      { key: "answer", label: "Javob", type: "textarea", placeholder: "Savol javobi" }
+    ]
+  },
+  {
+    name: "partnersSection.items",
+    title: "Hamkorlar",
+    description: "Rasmiy hamkorlar va logotiplarini shu yerdan boshqaring.",
+    addLabel: "Hamkor qo'shish",
+    createItem: () => ({ name: "", url: "", description: "", logo: "", logoType: "image" }),
+    fields: [
+      { key: "name", label: "Hamkor nomi", placeholder: "IT Park Uzbekistan" },
+      { key: "url", label: "Rasmiy havola", placeholder: "https://..." },
+      { key: "description", label: "Qisqa izoh", type: "textarea", placeholder: "Hamkor tavsifi" }
+    ],
+    media: {
+      urlKey: "logo",
+      typeKey: "logoType",
+      accept: "image/*",
+      label: "Hamkor logosi"
+    }
+  },
+  {
+    name: "liveStatus.items",
+    title: "Live status",
+    description: "Hero va ribbon ichida ko'rinadigan jonli status kartalari.",
+    addLabel: "Status qo'shish",
+    createItem: () => ({ label: "", value: "", tone: "primary" }),
+    fields: [
+      { key: "label", label: "Label", placeholder: "Qabul holati" },
+      { key: "value", label: "Qiymat", placeholder: "Ochiq" },
+      { key: "tone", label: "Rang turi", placeholder: "primary / success / info" }
+    ]
   },
   {
     name: "governmentOrganizations",
@@ -167,6 +244,7 @@ const staticMediaMap = Object.fromEntries(staticMediaConfigs.map((config) => [co
 document.addEventListener("DOMContentLoaded", async () => {
   setupFriendlyEditors();
   setupStaticMediaEditors();
+  initializePreview();
   bindEvents();
   await checkSession();
 });
@@ -200,6 +278,8 @@ function bindEvents() {
     if (field) {
       updateEditorItem(field);
     }
+
+    schedulePreviewSync();
   });
 
   contentForm.addEventListener("change", async (event) => {
@@ -222,6 +302,8 @@ function bindEvents() {
     if (editorMediaInput) {
       await uploadEditorMedia(editorMediaInput);
     }
+
+    schedulePreviewSync();
   });
 
   applicationsList.addEventListener("click", async (event) => {
@@ -321,6 +403,7 @@ async function loadDashboardData() {
     renderApplications();
     renderAppointments();
     document.getElementById("dashboardWelcome").textContent = `${state.user.username} uchun boshqaruv paneli`;
+    schedulePreviewSync(true);
   } catch (error) {
     if (error.status === 401) {
       showAuth();
@@ -328,6 +411,57 @@ async function loadDashboardData() {
     }
 
     showMessage("contentMessage", error.message);
+  }
+}
+
+function initializePreview() {
+  if (!previewFrame) {
+    return;
+  }
+
+  previewFrame.src = "/";
+  previewFrame.addEventListener("load", () => {
+    schedulePreviewSync(true);
+  });
+}
+
+function schedulePreviewSync(immediate = false) {
+  if (!previewFrame || dashboardView.classList.contains("hidden")) {
+    return;
+  }
+
+  if (state.previewSyncTimer) {
+    clearTimeout(state.previewSyncTimer);
+  }
+
+  const delay = immediate ? 0 : 220;
+  state.previewSyncTimer = setTimeout(() => {
+    syncPreviewFrame();
+  }, delay);
+}
+
+function syncPreviewFrame() {
+  if (!previewFrame || !previewFrame.contentWindow) {
+    return;
+  }
+
+  try {
+    const payload = collectContentForm();
+    previewFrame.contentWindow.postMessage(
+      {
+        type: "admin-preview-sync",
+        payload
+      },
+      window.location.origin
+    );
+
+    if (previewStatus) {
+      previewStatus.textContent = "Preview yangilandi.";
+    }
+  } catch (error) {
+    if (previewStatus) {
+      previewStatus.textContent = "Preview yangilanmadi.";
+    }
   }
 }
 
@@ -352,6 +486,7 @@ async function handleSaveContent() {
     state.content = result.data;
     fillContentForm(state.content);
     showMessage("contentMessage", "Sayt ma'lumotlari saqlandi.");
+    schedulePreviewSync(true);
   } catch (error) {
     showMessage("contentMessage", error.message);
   }
@@ -468,10 +603,16 @@ function fillContentForm(content) {
   setField("projects.tag", content.projects.tag);
   setField("projects.title", content.projects.title);
   setField("projects.description", content.projects.description);
+  setField("timelineSection.tag", content.timelineSection?.tag || "");
+  setField("timelineSection.title", content.timelineSection?.title || "");
+  setField("timelineSection.description", content.timelineSection?.description || "");
 
   setField("news.tag", content.news.tag);
   setField("news.title", content.news.title);
   setField("news.description", content.news.description);
+  setField("testimonialsSection.tag", content.testimonialsSection?.tag || "");
+  setField("testimonialsSection.title", content.testimonialsSection?.title || "");
+  setField("testimonialsSection.description", content.testimonialsSection?.description || "");
 
   setField("appointmentSection.tag", content.appointmentSection.tag);
   setField("appointmentSection.title", content.appointmentSection.title);
@@ -487,6 +628,12 @@ function fillContentForm(content) {
   setField("statusSection.title", content.statusSection.title);
   setField("statusSection.description", content.statusSection.description);
   setField("statusSection.helperText", content.statusSection.helperText);
+  setField("faqSection.title", content.faqSection?.title || "");
+  setField("faqSection.description", content.faqSection?.description || "");
+  setField("partnersSection.tag", content.partnersSection?.tag || "");
+  setField("partnersSection.title", content.partnersSection?.title || "");
+  setField("partnersSection.description", content.partnersSection?.description || "");
+  setField("liveStatus.title", content.liveStatus?.title || "");
 
   setField("contact.title", content.contact.title);
   setField("contact.description", content.contact.description);
@@ -509,12 +656,27 @@ function fillContentForm(content) {
     ...item,
     mediaType: item.mediaType || inferMediaType(item.image)
   })));
+  state.editorData["timelineSection.items"] = deepCopy(content.timelineSection?.items || []);
   state.editorData.metrics = deepCopy(content.metrics || []);
   state.editorData["news.items"] = deepCopy(content.news.items || []);
+  state.editorData["testimonialsSection.items"] = deepCopy(
+    (content.testimonialsSection?.items || []).map((item) => ({
+      ...item,
+      imageType: item.imageType || inferMediaType(item.image)
+    }))
+  );
   state.editorData["appointmentSection.meetingTypes"] = deepCopy(content.appointmentSection.meetingTypes || []);
   state.editorData["applicationSection.applicationOptions"] = deepCopy(
     content.applicationSection.applicationOptions || []
   );
+  state.editorData["faqSection.items"] = deepCopy(content.faqSection?.items || []);
+  state.editorData["partnersSection.items"] = deepCopy(
+    (content.partnersSection?.items || []).map((item) => ({
+      ...item,
+      logoType: item.logoType || inferMediaType(item.logo)
+    }))
+  );
+  state.editorData["liveStatus.items"] = deepCopy(content.liveStatus?.items || []);
   state.editorData.governmentOrganizations = deepCopy(content.governmentOrganizations || []);
 
   syncAllEditorFields();
@@ -574,12 +736,24 @@ function collectContentForm() {
       description: getField("projects.description"),
       items: state.editorData["projects.items"] || []
     },
+    timelineSection: {
+      tag: getField("timelineSection.tag"),
+      title: getField("timelineSection.title"),
+      description: getField("timelineSection.description"),
+      items: state.editorData["timelineSection.items"] || []
+    },
     metrics: state.editorData.metrics || [],
     news: {
       tag: getField("news.tag"),
       title: getField("news.title"),
       description: getField("news.description"),
       items: state.editorData["news.items"] || []
+    },
+    testimonialsSection: {
+      tag: getField("testimonialsSection.tag"),
+      title: getField("testimonialsSection.title"),
+      description: getField("testimonialsSection.description"),
+      items: state.editorData["testimonialsSection.items"] || []
     },
     appointmentSection: {
       tag: getField("appointmentSection.tag"),
@@ -601,6 +775,11 @@ function collectContentForm() {
       description: getField("statusSection.description"),
       helperText: getField("statusSection.helperText")
     },
+    faqSection: {
+      title: getField("faqSection.title"),
+      description: getField("faqSection.description"),
+      items: state.editorData["faqSection.items"] || []
+    },
     contact: {
       title: getField("contact.title"),
       description: getField("contact.description"),
@@ -611,6 +790,16 @@ function collectContentForm() {
       mapLink: getField("contact.mapLink"),
       telegram: getField("contact.telegram"),
       instagram: getField("contact.instagram")
+    },
+    partnersSection: {
+      tag: getField("partnersSection.tag"),
+      title: getField("partnersSection.title"),
+      description: getField("partnersSection.description"),
+      items: state.editorData["partnersSection.items"] || []
+    },
+    liveStatus: {
+      title: getField("liveStatus.title"),
+      items: state.editorData["liveStatus.items"] || []
     },
     governmentOrganizations: state.editorData.governmentOrganizations || [],
     footer: {
@@ -782,6 +971,7 @@ function addEditorItem(config) {
   items.push(config.createItem());
   syncEditorField(config.name);
   renderFriendlyEditor(config);
+  schedulePreviewSync();
 }
 
 function removeEditorItem(config, index) {
@@ -789,6 +979,7 @@ function removeEditorItem(config, index) {
   items.splice(index, 1);
   syncEditorField(config.name);
   renderFriendlyEditor(config);
+  schedulePreviewSync();
 }
 
 function updateEditorItem(field) {
@@ -808,6 +999,7 @@ function updateEditorItem(field) {
   }
 
   syncEditorField(config.name);
+  schedulePreviewSync();
 }
 
 async function uploadStaticMedia(input) {
@@ -828,6 +1020,7 @@ async function uploadStaticMedia(input) {
     setField(config.typeField, normalizeResourceType(result.resourceType));
     renderStaticMediaEditors();
     showMessage(messageTarget, "Media yuklandi.");
+    schedulePreviewSync();
   } catch (error) {
     showMessage(messageTarget, error.message);
   } finally {
@@ -858,6 +1051,7 @@ async function uploadEditorMedia(input) {
     syncEditorField(configName);
     renderFriendlyEditor(config);
     showMessage(messageTarget, "Media yuklandi.");
+    schedulePreviewSync();
   } catch (error) {
     showMessage(messageTarget, error.message);
   } finally {

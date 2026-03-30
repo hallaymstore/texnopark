@@ -121,21 +121,25 @@ const DEFAULT_SITE_CONTENT = {
     items: [
       {
         icon: "AI",
+        category: "Digital",
         title: "Sun'iy intellekt va dasturlash",
         description: "Web, backend, AI, data va avtomatlashtirish bo'yicha amaliy o'quv dasturlari."
       },
       {
         icon: "STEM",
+        category: "Engineering",
         title: "Robototexnika va muhandislik",
         description: "Prototiplash, konstruktorlik va apparat yechimlari ustida ishlash maydoni."
       },
       {
         icon: "MEDIA",
+        category: "Creative",
         title: "Digital media va dizayn",
         description: "Grafik dizayn, motion, SMM va kontent ishlab chiqish uchun kreativ laboratoriya."
       },
       {
         icon: "START",
+        category: "Business",
         title: "Startap inkubatsiya",
         description: "G'oyalarni biznes modelga aylantirish, pitch va mentorlik jarayoni."
       }
@@ -185,6 +189,38 @@ const DEFAULT_SITE_CONTENT = {
       }
     ]
   },
+  timelineSection: {
+    tag: "Qabul bosqichlari",
+    title: "Texnopark platformasiga qo'shilishning aniq va shaffof yo'li",
+    description:
+      "Talabgorlar, rezidentlar va hamkorlar uchun barcha bosqichlar oldindan ko'rsatiladi. Bu bo'lim qabul jarayonini tushunarli va ishonchli qiladi.",
+    items: [
+      {
+        step: "01",
+        title: "Ariza yuborish",
+        description: "Platformada forma to'ldiriladi va qurilmaga maxsus ID biriktiriladi.",
+        state: "active"
+      },
+      {
+        step: "02",
+        title: "Birlamchi saralash",
+        description: "Admin panelda ariza ko'rib chiqiladi va yo'nalish bo'yicha tasniflanadi.",
+        state: "upcoming"
+      },
+      {
+        step: "03",
+        title: "Uchrashuv yoki suhbat",
+        description: "Zarur bo'lsa uchrashuv yoki qisqa suhbat belgilanadi.",
+        state: "upcoming"
+      },
+      {
+        step: "04",
+        title: "Natijani e'lon qilish",
+        description: "Talabgor qurilma ID orqali o'z statusini va admin izohini ko'radi.",
+        state: "complete"
+      }
+    ]
+  },
   metrics: [
     {
       value: "18+",
@@ -229,6 +265,44 @@ const DEFAULT_SITE_CONTENT = {
       }
     ]
   },
+  testimonialsSection: {
+    tag: "Muvaffaqiyat hikoyalari",
+    title: "Texnopark rezidentlari, mentorlar va hamkorlar fikrlari",
+    description:
+      "Platforma ko'rinishi nafaqat zamonaviy, balki foydalanuvchilar uchun aniq natija beradigan boshqaruv muhitiga aylantirilgan.",
+    items: [
+      {
+        name: "Shahzod Xudoyberdiyev",
+        role: "AI yo'nalishi rezidenti",
+        quote:
+          "Ariza topshirish, statusni ko'rish va uchrashuvlarni boshqarish jarayoni ancha soddalashdi. Platforma premium va juda tushunarli.",
+        result: "AI intensiv dasturiga qabul qilingan",
+        image:
+          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80",
+        imageType: "image"
+      },
+      {
+        name: "Madina To'rayeva",
+        role: "Digital media treneri",
+        quote:
+          "Admin panel juda qulay. Kontentni oddiy formalar bilan yangilash mumkinligi jamoa uchun katta yengillik bo'ldi.",
+        result: "Kontent va media oqimi bir markazga yig'ildi",
+        image:
+          "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=80",
+        imageType: "image"
+      },
+      {
+        name: "Ulug'bek Mirzaev",
+        role: "Hamkor tashkilot vakili",
+        quote:
+          "Rasmiy ko'rinish, qulay aloqa bloklari va uchrashuv booking tizimi hamkorlik jarayonini ancha tezlashtirdi.",
+        result: "Hamkorlik uchrashuvlari onlayn boshqarilmoqda",
+        image:
+          "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80",
+        imageType: "image"
+      }
+    ]
+  },
   appointmentSection: {
     tag: "Uchrashuv belgilash",
     title: "Rahbariyat yoki loyiha jamoasi bilan uchrashuv so'rang",
@@ -258,6 +332,28 @@ const DEFAULT_SITE_CONTENT = {
       "Tizim qurilmangiz uchun ID yaratadi. Shu ID orqali barcha yuborilgan arizalar va admin tomonidan yangilangan natijalar ko'rsatiladi.",
     helperText:
       "Agar boshqa brauzer yoki qurilmadan kirsangiz, avvalgi device ID ni shu yerga kiritib tekshirishingiz mumkin."
+  },
+  faqSection: {
+    title: "Ko'p so'raladigan savollar",
+    description: "Qidiruv orqali kerakli savolni tez topish mumkin.",
+    items: [
+      {
+        question: "Ariza topshirish qanday ishlaydi?",
+        answer: "Foydalanuvchi forma to'ldiradi, tizim esa avtomatik device ID yaratib statusni shu ID orqali kuzatish imkonini beradi."
+      },
+      {
+        question: "Uchrashuv qanday belgilanadi?",
+        answer: "Uchrashuv bo'limida kerakli tur va sanani tanlab so'rov yuboriladi, admin esa panel orqali holatni boshqaradi."
+      },
+      {
+        question: "Natijani qayerdan bilaman?",
+        answer: "Status bo'limida device ID kiritilib, barcha yuborilgan arizalar va admin izohlari ko'riladi."
+      },
+      {
+        question: "Ro'yxatdan o'tish kerakmi?",
+        answer: "Yo'q. Tizim ro'yxatdan o'tmasdan ishlash uchun device ID asosidagi qulay oqimni taklif qiladi."
+      }
+    ]
   },
   contact: {
     title: "Qarshi Yoshlar Texnoparki bilan bog'lanish",
@@ -298,6 +394,66 @@ const DEFAULT_SITE_CONTENT = {
       description: "IT ekotizimi, startaplar va rezident loyihalarni rivojlantirish bo'yicha hamkor platforma."
     }
   ],
+  partnersSection: {
+    tag: "Rasmiy hamkorlar",
+    title: "Ekotizimni qo'llab-quvvatlayotgan hamkorlar va platformalar",
+    description:
+      "Davlat, ta'lim va texnologik hamkorlar bilan birgalikdagi ishlar uchun rasmiy hamkorlar devori alohida ko'rsatiladi.",
+    items: [
+      {
+        name: "Yoshlar ishlari agentligi",
+        url: "https://yoshlar.gov.uz",
+        description: "Yoshlar siyosati va dasturlar hamkori",
+        logo:
+          "https://dummyimage.com/480x280/eaf0ff/3557cb.png&text=Yoshlar+Agentligi",
+        logoType: "image"
+      },
+      {
+        name: "IT Park Uzbekistan",
+        url: "https://it-park.uz",
+        description: "Texnologik ekotizim hamkori",
+        logo:
+          "https://dummyimage.com/480x280/eaf0ff/3557cb.png&text=IT+Park",
+        logoType: "image"
+      },
+      {
+        name: "Qashqadaryo viloyati hokimligi",
+        url: "https://qashqadaryo.uz",
+        description: "Hududiy rivojlanish hamkori",
+        logo:
+          "https://dummyimage.com/480x280/eaf0ff/3557cb.png&text=Qashqadaryo+hokimligi",
+        logoType: "image"
+      },
+      {
+        name: "Raqamli texnologiyalar vazirligi",
+        url: "https://digital.uz",
+        description: "Raqamli ekotizim hamkori",
+        logo:
+          "https://dummyimage.com/480x280/eaf0ff/3557cb.png&text=Digital+Uz",
+        logoType: "image"
+      }
+    ]
+  },
+  liveStatus: {
+    title: "Jonli status",
+    items: [
+      {
+        label: "Qabul holati",
+        value: "Ochiq",
+        tone: "success"
+      },
+      {
+        label: "Platforma",
+        value: "24/7 online",
+        tone: "primary"
+      },
+      {
+        label: "Uchrashuvlar",
+        value: "Haftalik slotlar faol",
+        tone: "info"
+      }
+    ]
+  },
   footer: {
     officialLabel: "Rasmiy axborot platformasi",
     officialNote:

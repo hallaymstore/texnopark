@@ -1,9 +1,13 @@
 const state = {
   content: null,
   deviceId: getOrCreateDeviceId(),
-  theme: document.documentElement.dataset.theme || "light"
+  theme: document.documentElement.dataset.theme || "light",
+  directionFilter: "all",
+  faqQuery: "",
+  previewMode: false
 };
 
+const pageLoader = document.getElementById("pageLoader");
 const menuToggle = document.getElementById("menuToggle");
 const mobileMenu = document.getElementById("mobileMenu");
 const govMenu = document.getElementById("govMenu");
@@ -17,9 +21,11 @@ const quickSearchForm = document.getElementById("quickSearchForm");
 const quickSearchInput = document.getElementById("quickSearchInput");
 const quickSearchSuggestions = document.getElementById("quickSearchSuggestions");
 const searchFeedback = document.getElementById("searchFeedback");
+const faqSearchInput = document.getElementById("faqSearchInput");
 const insightTicker = document.getElementById("insightTicker");
 const programCloud = document.getElementById("programCloud");
 const heroFloatStack = document.getElementById("heroFloatStack");
+const programFilters = document.getElementById("programFilters");
 const meetingForm = document.getElementById("meetingForm");
 const applicationForm = document.getElementById("applicationForm");
 const statusForm = document.getElementById("statusForm");
@@ -36,6 +42,8 @@ const systemThemeQuery =
 const defaultFavicon =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f80ff'/%3E%3Ctext x='50%25' y='56%25' font-size='28' text-anchor='middle' fill='white' font-family='Arial'%3EQY%3C/text%3E%3C/svg%3E";
 
+window.addEventListener("message", handlePreviewMessage);
+
 document.addEventListener("DOMContentLoaded", async () => {
   initializeTheme();
   deviceIdLabel.textContent = state.deviceId;
@@ -47,6 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadSiteContent();
   await lookupApplicationStatus(state.deviceId, false);
   initializeRevealObserver();
+  window.addEventListener("load", hidePageLoader, { once: true });
 });
 
 function bindUi() {
@@ -56,6 +65,33 @@ function bindUi() {
 
   if (quickSearchForm) {
     quickSearchForm.addEventListener("submit", handleQuickSearch);
+  }
+
+  if (faqSearchInput) {
+    faqSearchInput.addEventListener("input", () => {
+      state.faqQuery = faqSearchInput.value.trim().toLowerCase();
+
+      if (state.content) {
+        renderFaq(state.content);
+      }
+    });
+  }
+
+  if (programFilters) {
+    programFilters.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-program-filter]");
+
+      if (!button) {
+        return;
+      }
+
+      state.directionFilter = button.dataset.programFilter || "all";
+
+      if (state.content) {
+        renderProgramFilters(state.content.directions.items || []);
+        renderDirections(state.content.directions.items || []);
+      }
+    });
   }
 
   if (menuToggle) {
@@ -106,6 +142,7 @@ function bindWindowEffects() {
   updateScrollProgress();
   window.addEventListener("scroll", updateScrollProgress, { passive: true });
   bindInteractiveGlow();
+  bindMagneticButtons();
   initializeSectionObserver();
 }
 
@@ -123,6 +160,7 @@ async function loadSiteContent() {
   } catch (error) {
     showMessage("meetingMessage", "Kontent yuklanmadi, serverni tekshiring.");
     showMessage("applicationMessage", "Kontent yuklanmadi, serverni tekshiring.");
+    hidePageLoader();
   }
 }
 
@@ -174,9 +212,15 @@ function renderContent(content) {
   renderMedia("aboutMediaB", content.about.imageB, `${content.general.organizationName} foto 2`, content.about.imageBType);
   renderFeatureList(content.about.features || []);
 
+  setText("timelineTag", content.timelineSection?.tag || "Qabul bosqichlari");
+  setText("timelineTitle", content.timelineSection?.title || "");
+  setText("timelineDescription", content.timelineSection?.description || "");
+  renderTimeline(content.timelineSection || {});
+
   setText("directionsTag", content.directions.tag);
   setText("directionsTitle", content.directions.title);
   setText("directionsDescription", content.directions.description);
+  renderProgramFilters(content.directions.items || []);
   renderDirections(content.directions.items || []);
 
   setText("projectsTag", content.projects.tag);
@@ -190,6 +234,11 @@ function renderContent(content) {
   setText("newsTitle", content.news.title);
   setText("newsDescription", content.news.description);
   renderNews(content.news.items || []);
+
+  setText("testimonialsTag", content.testimonialsSection?.tag || "Muvaffaqiyat hikoyalari");
+  setText("testimonialsTitle", content.testimonialsSection?.title || "");
+  setText("testimonialsDescription", content.testimonialsSection?.description || "");
+  renderTestimonials(content.testimonialsSection || {});
 
   setText("meetingTag", content.appointmentSection.tag);
   setText("meetingTitle", content.appointmentSection.title);
@@ -207,6 +256,8 @@ function renderContent(content) {
   setText("statusTitle", content.statusSection.title);
   setText("statusDescription", content.statusSection.description);
   setText("statusHelper", content.statusSection.helperText);
+  setText("liveStatusTitle", content.liveStatus?.title || "Platforma holati");
+  renderLiveStatus(content.liveStatus || {});
 
   setText("contactTitle", content.contact.title);
   setText("contactDescription", content.contact.description);
@@ -226,8 +277,20 @@ function renderContent(content) {
   setText("footerOfficialLabel", content.footer?.officialLabel || "Rasmiy axborot platformasi");
   setText("footerOfficialNote", content.footer?.officialNote || "");
   setText("footerLegalText", content.footer?.legalText || "");
+  setText("partnersTag", content.partnersSection?.tag || "Rasmiy hamkorlar");
+  setText("partnersTitle", content.partnersSection?.title || "");
+  setText("partnersDescription", content.partnersSection?.description || "");
+  renderPartners(content.partnersSection || {});
 
   renderGovernmentOrganizations(content.governmentOrganizations || []);
+
+  if (faqSearchInput && document.activeElement !== faqSearchInput) {
+    faqSearchInput.value = state.faqQuery;
+  }
+
+  bindInteractiveGlow();
+  initializeRevealObserver();
+  hidePageLoader();
 }
 
 function renderAboutPreview(content) {
@@ -248,7 +311,7 @@ function renderFaq(content) {
     return;
   }
 
-  const items = [
+  const fallbackItems = [
     {
       question: "Ariza topshirish qanday ishlaydi?",
       answer: content.applicationSection.helperText || content.applicationSection.description
@@ -262,14 +325,39 @@ function renderFaq(content) {
       answer: content.statusSection.helperText || content.statusSection.description
     }
   ];
+  const sourceItems = content.faqSection?.items?.length ? content.faqSection.items : fallbackItems;
+  const normalizedQuery = state.faqQuery;
+  const filteredItems = normalizedQuery
+    ? sourceItems.filter((item) =>
+        [item.question, item.answer].some((value) =>
+          String(value || "")
+            .toLowerCase()
+            .includes(normalizedQuery)
+        )
+      )
+    : sourceItems;
 
-  target.innerHTML = items
+  if (faqSearchInput) {
+    faqSearchInput.setAttribute("aria-label", content.faqSection?.title || "FAQ qidiruvi");
+  }
+
+  if (!filteredItems.length) {
+    target.innerHTML = `
+      <div class="faq-empty">
+        <strong>Natija topilmadi</strong>
+        <p>Boshqa kalit so'z bilan qayta qidirib ko'ring.</p>
+      </div>
+    `;
+    return;
+  }
+
+  target.innerHTML = filteredItems
     .map(
       (item, index) => `
-        <article class="faq-item ${index === 0 ? "open" : ""}">
-          <button class="faq-question" type="button">
+        <article class="faq-item ${index === 0 || Boolean(normalizedQuery) ? "open" : ""}">
+          <button class="faq-question" type="button" aria-expanded="${index === 0 || Boolean(normalizedQuery) ? "true" : "false"}">
             <span>${escapeHtml(item.question)}</span>
-            <span>${index === 0 ? "-" : "+"}</span>
+            <span>${index === 0 || Boolean(normalizedQuery) ? "-" : "+"}</span>
           </button>
           <div class="faq-answer">
             <p>${escapeHtml(item.answer)}</p>
@@ -285,11 +373,16 @@ function renderFaq(content) {
 
       target.querySelectorAll(".faq-item").forEach((item) => {
         const icon = item.querySelector(".faq-question span:last-child");
+        const toggle = item.querySelector(".faq-question");
         const isCurrent = item === current;
         item.classList.toggle("open", isCurrent ? !item.classList.contains("open") : false);
 
         if (icon) {
           icon.textContent = item.classList.contains("open") ? "-" : "+";
+        }
+
+        if (toggle) {
+          toggle.setAttribute("aria-expanded", item.classList.contains("open") ? "true" : "false");
         }
       });
     });
@@ -323,8 +416,12 @@ function renderInsightTicker(content) {
       value: content.contact.phone || "Doim ochiq"
     }
   ];
+  const liveItems = (content.liveStatus?.items || []).map((item) => ({
+    label: item.label,
+    value: item.value
+  }));
 
-  const repeated = [...items, ...items];
+  const repeated = [...items, ...liveItems, ...items, ...liveItems];
 
   insightTicker.innerHTML = `
     <div class="insight-marquee">
@@ -401,6 +498,15 @@ function hydrateSearch(content) {
       text: [content.about.title, content.about.description, ...(content.about.features || [])].join(" ")
     },
     {
+      label: "Qabul bosqichlari",
+      id: "timeline",
+      text: [
+        content.timelineSection?.title,
+        content.timelineSection?.description,
+        ...(content.timelineSection?.items || []).flatMap((item) => [item.step, item.title, item.description])
+      ].join(" ")
+    },
+    {
       label: "Yo'nalishlar",
       id: "directions",
       text: [
@@ -428,6 +534,15 @@ function hydrateSearch(content) {
       ].join(" ")
     },
     {
+      label: "Muvaffaqiyat hikoyalari",
+      id: "testimonials",
+      text: [
+        content.testimonialsSection?.title,
+        content.testimonialsSection?.description,
+        ...(content.testimonialsSection?.items || []).flatMap((item) => [item.name, item.role, item.quote, item.result])
+      ].join(" ")
+    },
+    {
       label: "Uchrashuv",
       id: "meeting",
       text: [content.appointmentSection.title, content.appointmentSection.description, content.appointmentSection.note].join(" ")
@@ -441,6 +556,15 @@ function hydrateSearch(content) {
       label: "Natijalar",
       id: "status",
       text: [content.statusSection.title, content.statusSection.description, content.statusSection.helperText].join(" ")
+    },
+    {
+      label: "Hamkorlar",
+      id: "partners",
+      text: [
+        content.partnersSection?.title,
+        content.partnersSection?.description,
+        ...(content.partnersSection?.items || []).flatMap((item) => [item.name, item.description])
+      ].join(" ")
     },
     {
       label: "Bog'lanish",
@@ -487,12 +611,73 @@ function renderFeatureList(items) {
     .join("");
 }
 
+function renderProgramFilters(items) {
+  if (!programFilters) {
+    return;
+  }
+
+  const categories = Array.from(
+    new Set(
+      items
+        .map((item) => String(item.category || "").trim())
+        .filter(Boolean)
+    )
+  );
+
+  if (!categories.length) {
+    state.directionFilter = "all";
+    programFilters.hidden = true;
+    programFilters.innerHTML = "";
+    return;
+  }
+
+  if (state.directionFilter !== "all" && !categories.includes(state.directionFilter)) {
+    state.directionFilter = "all";
+  }
+
+  const filters = ["all", ...categories];
+  programFilters.hidden = filters.length <= 1;
+  programFilters.innerHTML = filters
+    .map((category) => {
+      const isAll = category === "all";
+      const label = isAll ? "Barchasi" : category;
+      return `
+        <button
+          class="filter-chip ${state.directionFilter === category ? "is-active" : ""}"
+          type="button"
+          data-program-filter="${escapeHtml(category)}"
+          aria-pressed="${state.directionFilter === category ? "true" : "false"}"
+        >
+          ${escapeHtml(label)}
+        </button>
+      `;
+    })
+    .join("");
+}
+
 function renderDirections(items) {
   const target = document.getElementById("directionsGrid");
-  target.innerHTML = items
+
+  const filteredItems =
+    state.directionFilter === "all"
+      ? items
+      : items.filter((item) => String(item.category || "").trim() === state.directionFilter);
+
+  if (!filteredItems.length) {
+    target.innerHTML = `
+      <article class="empty-state-card reveal visible">
+        <strong>Bu kategoriya uchun blok topilmadi</strong>
+        <p>Boshqa yo'nalishni tanlang yoki admin paneldan yangi dastur qo'shing.</p>
+      </article>
+    `;
+    return;
+  }
+
+  target.innerHTML = filteredItems
     .map(
       (item) => `
         <article class="info-card reveal">
+          <span class="card-kicker">${escapeHtml(item.category || "Yo'nalish")}</span>
           <div class="card-icon">${escapeHtml(item.icon)}</div>
           <h3>${escapeHtml(item.title)}</h3>
           <p>${escapeHtml(item.description)}</p>
@@ -500,6 +685,164 @@ function renderDirections(items) {
       `
     )
     .join("");
+}
+
+function renderTimeline(section) {
+  const target = document.getElementById("timelineGrid");
+
+  if (!target) {
+    return;
+  }
+
+  const items = section.items || [];
+
+  if (!items.length) {
+    target.innerHTML = `
+      <article class="empty-state-card reveal visible">
+        <strong>Timeline bo'sh</strong>
+        <p>Qabul bosqichlari admin paneldan bir necha soniyada to'ldiriladi.</p>
+      </article>
+    `;
+    return;
+  }
+
+  target.innerHTML = items
+    .map((item, index) => {
+      const normalizedState = normalizeTimelineState(item.state);
+
+      return `
+        <article class="timeline-card timeline-${normalizedState} reveal">
+          <div class="timeline-step-row">
+            <span class="timeline-step">${escapeHtml(item.step || String(index + 1).padStart(2, "0"))}</span>
+            <span class="timeline-state">${timelineStateLabel(normalizedState)}</span>
+          </div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.description)}</p>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderTestimonials(section) {
+  const target = document.getElementById("testimonialsGrid");
+
+  if (!target) {
+    return;
+  }
+
+  const items = section.items || [];
+
+  if (!items.length) {
+    target.innerHTML = `
+      <article class="empty-state-card reveal visible">
+        <strong>Sharhlar hali kiritilmagan</strong>
+        <p>Admin paneldan rezidentlar yoki hamkorlar fikrlarini qo'shish mumkin.</p>
+      </article>
+    `;
+    return;
+  }
+
+  target.innerHTML = items
+    .map((item) => {
+      const imageUrl = sanitizeMediaUrl(item.image);
+      const initials = buildInitials(item.name);
+
+      return `
+        <article class="testimonial-card reveal interactive-surface">
+          <div class="testimonial-top">
+            <div class="testimonial-avatar">
+              ${
+                imageUrl
+                  ? `<img src="${imageUrl}" alt="${escapeHtml(item.name)}" />`
+                  : `<span>${escapeHtml(initials)}</span>`
+              }
+            </div>
+            <div class="testimonial-meta">
+              <strong>${escapeHtml(item.name)}</strong>
+              <span>${escapeHtml(item.role)}</span>
+            </div>
+          </div>
+          <p class="testimonial-quote">"${escapeHtml(item.quote)}"</p>
+          <div class="testimonial-result">
+            <span>Natija</span>
+            <strong>${escapeHtml(item.result)}</strong>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderPartners(section) {
+  const target = document.getElementById("partnersGrid");
+
+  if (!target) {
+    return;
+  }
+
+  const items = section.items || [];
+
+  if (!items.length) {
+    target.innerHTML = `
+      <article class="empty-state-card reveal visible">
+        <strong>Hamkorlar devori hozircha bo'sh</strong>
+        <p>Rasmiy tashkilotlar va ekotizim logotiplarini admin paneldan yuklash mumkin.</p>
+      </article>
+    `;
+    return;
+  }
+
+  target.innerHTML = items
+    .map((item) => {
+      const logoUrl = sanitizeMediaUrl(item.logo);
+
+      return `
+        <a class="partner-card reveal interactive-surface" href="${sanitizeHref(item.url)}" target="_blank" rel="noreferrer">
+          <div class="partner-logo">
+            ${
+              logoUrl
+                ? `<img src="${logoUrl}" alt="${escapeHtml(item.name)} logotipi" />`
+                : `<span>${escapeHtml(buildInitials(item.name))}</span>`
+            }
+          </div>
+          <div class="partner-copy">
+            <strong>${escapeHtml(item.name)}</strong>
+            <p>${escapeHtml(item.description)}</p>
+          </div>
+          <span class="partner-arrow">/</span>
+        </a>
+      `;
+    })
+    .join("");
+}
+
+function renderLiveStatus(section) {
+  const target = document.getElementById("liveStatusList");
+
+  if (!target) {
+    return;
+  }
+
+  const items = section.items || [];
+
+  target.innerHTML = items.length
+    ? items
+        .map(
+          (item) => `
+            <article class="live-status-item is-${normalizeTone(item.tone)}">
+              <span>${escapeHtml(item.label)}</span>
+              <strong>${escapeHtml(item.value)}</strong>
+            </article>
+          `
+        )
+        .join("")
+    : `
+        <article class="live-status-item is-primary">
+          <span>Platforma</span>
+          <strong>Faol</strong>
+        </article>
+      `;
 }
 
 function renderProjects(items) {
@@ -680,7 +1023,7 @@ async function lookupApplicationStatus(deviceId, fromManualSubmit) {
 }
 
 function initializeRevealObserver() {
-  const items = document.querySelectorAll(".reveal");
+  const items = document.querySelectorAll(".reveal:not(.visible)");
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -754,6 +1097,11 @@ function initializeSectionObserver() {
 
 function bindInteractiveGlow() {
   document.querySelectorAll(".interactive-surface").forEach((surface) => {
+    if (surface.dataset.glowBound === "true") {
+      return;
+    }
+
+    surface.dataset.glowBound = "true";
     surface.addEventListener("mousemove", (event) => {
       const rect = surface.getBoundingClientRect();
       const x = `${event.clientX - rect.left}px`;
@@ -762,6 +1110,36 @@ function bindInteractiveGlow() {
       surface.style.setProperty("--pointer-y", y);
     });
   });
+}
+
+function bindMagneticButtons() {
+  if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+    return;
+  }
+
+  document
+    .querySelectorAll(".btn, .nav-cta, .sidebar-cta, .ribbon-link, .quick-dock-link")
+    .forEach((element) => {
+      if (element.dataset.magneticBound === "true") {
+        return;
+      }
+
+      element.dataset.magneticBound = "true";
+      element.classList.add("magnetic-ready");
+
+      element.addEventListener("mousemove", (event) => {
+        const rect = element.getBoundingClientRect();
+        const offsetX = (event.clientX - rect.left - rect.width / 2) * 0.14;
+        const offsetY = (event.clientY - rect.top - rect.height / 2) * 0.16;
+        element.style.setProperty("--mx", `${offsetX}px`);
+        element.style.setProperty("--my", `${offsetY}px`);
+      });
+
+      element.addEventListener("mouseleave", () => {
+        element.style.setProperty("--mx", "0px");
+        element.style.setProperty("--my", "0px");
+      });
+    });
 }
 
 function animateCounter(element) {
@@ -1128,6 +1506,29 @@ function handleQuickSearch(event) {
   showMessage("searchFeedback", `${match.label} bo'limiga o'tildi.`);
 }
 
+function hidePageLoader() {
+  if (!pageLoader || pageLoader.classList.contains("is-hidden")) {
+    return;
+  }
+
+  pageLoader.classList.add("is-hidden");
+  pageLoader.setAttribute("aria-hidden", "true");
+}
+
+function handlePreviewMessage(event) {
+  if (event.origin !== window.location.origin) {
+    return;
+  }
+
+  if (event.data?.type !== "admin-preview-sync" || !event.data.payload) {
+    return;
+  }
+
+  state.previewMode = true;
+  state.content = event.data.payload;
+  renderContent(event.data.payload);
+}
+
 function readStoredTheme() {
   try {
     return localStorage.getItem("qyt_theme");
@@ -1199,6 +1600,44 @@ function renderGovernmentOrganizations(items) {
   if (footer) {
     footer.innerHTML = footerHtml;
   }
+}
+
+function normalizeTimelineState(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+
+  if (["active", "current", "in_progress"].includes(normalized)) {
+    return "active";
+  }
+
+  if (["complete", "completed", "done"].includes(normalized)) {
+    return "complete";
+  }
+
+  return "upcoming";
+}
+
+function timelineStateLabel(value) {
+  const labels = {
+    active: "Faol bosqich",
+    complete: "Yakunlangan",
+    upcoming: "Keyingi bosqich"
+  };
+
+  return labels[value] || labels.upcoming;
+}
+
+function normalizeTone(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+
+  if (["success", "green"].includes(normalized)) {
+    return "success";
+  }
+
+  if (["info", "accent", "cyan"].includes(normalized)) {
+    return "info";
+  }
+
+  return "primary";
 }
 
 function buildInitials(text) {

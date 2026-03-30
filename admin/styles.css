@@ -305,6 +305,20 @@ h4 {
   line-height: 1.8;
 }
 
+.preview-frame-shell {
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(116, 166, 228, 0.18);
+  background: rgba(246, 250, 255, 0.9);
+}
+
+.preview-frame-shell iframe {
+  width: 100%;
+  height: 520px;
+  border: 0;
+  background: #ffffff;
+}
+
 .friendly-editor,
 .media-editor {
   display: grid;

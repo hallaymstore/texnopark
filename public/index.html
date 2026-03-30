@@ -78,6 +78,15 @@
   </script>
 </head>
 <body>
+  <a class="skip-link" href="#home">Asosiy kontentga o'tish</a>
+  <div class="page-loader" id="pageLoader" aria-hidden="true">
+    <div class="loader-core">
+      <div class="loader-brand-mark">QY</div>
+      <strong>Qarshi Yoshlar Texnoparki</strong>
+      <p>Premium platforma yuklanmoqda...</p>
+      <div class="loader-bar"><span></span></div>
+    </div>
+  </div>
   <div class="scroll-progress" id="scrollProgress"></div>
   <div class="ambient ambient-a"></div>
   <div class="ambient ambient-b"></div>
@@ -106,28 +115,44 @@
             <span class="sidebar-link-index">02</span>
             <span>Markaz haqida</span>
           </a>
-          <a class="sidebar-link" data-nav-link href="#directions">
+          <a class="sidebar-link" data-nav-link href="#timeline">
             <span class="sidebar-link-index">03</span>
+            <span>Qabul bosqichlari</span>
+          </a>
+          <a class="sidebar-link" data-nav-link href="#directions">
+            <span class="sidebar-link-index">04</span>
             <span>Yo'nalishlar</span>
           </a>
           <a class="sidebar-link" data-nav-link href="#projects">
-            <span class="sidebar-link-index">04</span>
+            <span class="sidebar-link-index">05</span>
             <span>Loyihalar</span>
           </a>
+          <a class="sidebar-link" data-nav-link href="#news">
+            <span class="sidebar-link-index">06</span>
+            <span>Yangiliklar</span>
+          </a>
+          <a class="sidebar-link" data-nav-link href="#testimonials">
+            <span class="sidebar-link-index">07</span>
+            <span>Fikrlar</span>
+          </a>
           <a class="sidebar-link" data-nav-link href="#meeting">
-            <span class="sidebar-link-index">05</span>
+            <span class="sidebar-link-index">08</span>
             <span>Uchrashuv</span>
           </a>
           <a class="sidebar-link" data-nav-link href="#application">
-            <span class="sidebar-link-index">06</span>
+            <span class="sidebar-link-index">09</span>
             <span>Ariza</span>
           </a>
           <a class="sidebar-link" data-nav-link href="#status">
-            <span class="sidebar-link-index">07</span>
+            <span class="sidebar-link-index">10</span>
             <span>Natijalar</span>
           </a>
+          <a class="sidebar-link" data-nav-link href="#partners">
+            <span class="sidebar-link-index">11</span>
+            <span>Hamkorlar</span>
+          </a>
           <a class="sidebar-link" data-nav-link href="#contact">
-            <span class="sidebar-link-index">08</span>
+            <span class="sidebar-link-index">12</span>
             <span>Bog'lanish</span>
           </a>
         </nav>
@@ -190,11 +215,15 @@
       <div class="mobile-menu" id="mobileMenu">
         <a href="#home">Asosiy</a>
         <a href="#about">Markaz haqida</a>
+        <a href="#timeline">Qabul bosqichlari</a>
         <a href="#directions">Yo'nalishlar</a>
         <a href="#projects">Loyihalar</a>
+        <a href="#news">Yangiliklar</a>
+        <a href="#testimonials">Fikrlar</a>
         <a href="#meeting">Uchrashuv</a>
         <a href="#application">Ariza</a>
         <a href="#status">Natijalar</a>
+        <a href="#partners">Hamkorlar</a>
         <a href="#contact">Bog'lanish</a>
         <div class="mobile-orgs">
           <button class="mobile-org-toggle" id="mobileOrgToggle" type="button">
@@ -258,7 +287,19 @@
                 <span class="section-tag">Ko'p so'raladigan savollar</span>
                 <h3>Tezkor javoblar</h3>
               </div>
+              <label class="faq-search-shell" for="faqSearchInput">
+                <span>FAQ qidiruvi</span>
+                <input id="faqSearchInput" type="search" placeholder="Savol yoki kalit so'z yozing" />
+              </label>
               <div class="faq-list" id="faqList"></div>
+            </article>
+
+            <article class="side-panel reveal delay-1 interactive-surface">
+              <div class="side-panel-head">
+                <span class="section-tag">Jonli status</span>
+                <h3 id="liveStatusTitle">Platforma holati</h3>
+              </div>
+              <div class="live-status-list" id="liveStatusList"></div>
             </article>
           </aside>
         </section>
@@ -291,12 +332,22 @@
           </div>
         </section>
 
+        <section class="panel-section reveal interactive-surface" id="timeline">
+          <div class="section-head">
+            <div class="section-tag" id="timelineTag">Qabul bosqichlari</div>
+            <h2 id="timelineTitle"></h2>
+            <p id="timelineDescription"></p>
+          </div>
+          <div class="timeline-grid" id="timelineGrid"></div>
+        </section>
+
         <section class="panel-section reveal interactive-surface" id="directions">
           <div class="section-head">
             <div class="section-tag" id="directionsTag">Asosiy yo'nalishlar</div>
             <h2 id="directionsTitle"></h2>
             <p id="directionsDescription"></p>
           </div>
+          <div class="filter-row" id="programFilters"></div>
           <div class="cards-grid" id="directionsGrid"></div>
         </section>
 
@@ -324,6 +375,24 @@
             <p id="newsDescription"></p>
           </div>
           <div class="news-grid" id="newsGrid"></div>
+        </section>
+
+        <section class="panel-section reveal interactive-surface" id="testimonials">
+          <div class="section-head">
+            <div class="section-tag" id="testimonialsTag">Muvaffaqiyat hikoyalari</div>
+            <h2 id="testimonialsTitle"></h2>
+            <p id="testimonialsDescription"></p>
+          </div>
+          <div class="testimonials-grid" id="testimonialsGrid"></div>
+        </section>
+
+        <section class="panel-section reveal interactive-surface" id="partners">
+          <div class="section-head">
+            <div class="section-tag" id="partnersTag">Rasmiy hamkorlar</div>
+            <h2 id="partnersTitle"></h2>
+            <p id="partnersDescription"></p>
+          </div>
+          <div class="partners-grid" id="partnersGrid"></div>
         </section>
 
         <section class="forms-board">
@@ -447,11 +516,15 @@
             <h3>Asosiy bo'limlar</h3>
             <div class="footer-links">
               <a href="#about">Markaz haqida</a>
+              <a href="#timeline">Qabul bosqichlari</a>
               <a href="#directions">Yo'nalishlar</a>
               <a href="#projects">Loyihalar</a>
+              <a href="#news">Yangiliklar</a>
+              <a href="#testimonials">Fikrlar</a>
               <a href="#meeting">Uchrashuv</a>
               <a href="#application">Ariza</a>
               <a href="#status">Natijalar</a>
+              <a href="#partners">Hamkorlar</a>
             </div>
           </div>
 

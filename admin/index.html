@@ -130,6 +130,20 @@
             </div>
 
             <div class="form-section">
+              <h4>Timeline va testimonials</h4>
+              <div class="field-grid">
+                <label><span>Timeline tag</span><input name="timelineSection.tag" type="text" /></label>
+                <label><span>Testimonials tag</span><input name="testimonialsSection.tag" type="text" /></label>
+                <label class="full"><span>Timeline title</span><textarea name="timelineSection.title" rows="2"></textarea></label>
+                <label class="full"><span>Timeline description</span><textarea name="timelineSection.description" rows="3"></textarea></label>
+                <label class="full legacy-field"><span>Timeline items JSON</span><textarea name="timelineSection.items" rows="12"></textarea></label>
+                <label class="full"><span>Testimonials title</span><textarea name="testimonialsSection.title" rows="2"></textarea></label>
+                <label class="full"><span>Testimonials description</span><textarea name="testimonialsSection.description" rows="3"></textarea></label>
+                <label class="full legacy-field"><span>Testimonials items JSON</span><textarea name="testimonialsSection.items" rows="12"></textarea></label>
+              </div>
+            </div>
+
+            <div class="form-section">
               <h4>Yangiliklar va foydalanuvchi oqimlari</h4>
               <div class="field-grid">
                 <label><span>News tag</span><input name="news.tag" type="text" /></label>
@@ -150,6 +164,21 @@
                 <label class="full"><span>Status title</span><textarea name="statusSection.title" rows="2"></textarea></label>
                 <label class="full"><span>Status description</span><textarea name="statusSection.description" rows="3"></textarea></label>
                 <label class="full"><span>Status helper</span><textarea name="statusSection.helperText" rows="3"></textarea></label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4>FAQ, live status va hamkorlar</h4>
+              <div class="field-grid">
+                <label class="full"><span>FAQ title</span><input name="faqSection.title" type="text" /></label>
+                <label class="full"><span>FAQ description</span><textarea name="faqSection.description" rows="3"></textarea></label>
+                <label class="full legacy-field"><span>FAQ items JSON</span><textarea name="faqSection.items" rows="12"></textarea></label>
+                <label class="full"><span>Live status title</span><input name="liveStatus.title" type="text" /></label>
+                <label class="full legacy-field"><span>Live status items JSON</span><textarea name="liveStatus.items" rows="10"></textarea></label>
+                <label><span>Partners tag</span><input name="partnersSection.tag" type="text" /></label>
+                <label><span>Partners title</span><input name="partnersSection.title" type="text" /></label>
+                <label class="full"><span>Partners description</span><textarea name="partnersSection.description" rows="3"></textarea></label>
+                <label class="full legacy-field"><span>Partners items JSON</span><textarea name="partnersSection.items" rows="12"></textarea></label>
               </div>
             </div>
 
@@ -197,6 +226,19 @@
               <li>Media yuklangach preview darhol ko'rinadi.</li>
               <li>Hamma o'zgarishlarni oxirida bitta marta saqlash kifoya.</li>
             </ul>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Live preview</h3>
+                <p>Saqlashdan oldin public sahifaning jonli preview ko'rinishi.</p>
+              </div>
+            </div>
+            <div class="preview-frame-shell">
+              <iframe id="previewFrame" title="Public sayt preview" loading="lazy"></iframe>
+            </div>
+            <p class="message" id="previewStatus">Preview yuklanmoqda...</p>
           </article>
         </aside>
       </div>
