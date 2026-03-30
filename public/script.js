@@ -1,6 +1,7 @@
 const state = {
   content: null,
-  deviceId: getOrCreateDeviceId()
+  deviceId: getOrCreateDeviceId(),
+  theme: document.documentElement.dataset.theme || "light"
 };
 
 const menuToggle = document.getElementById("menuToggle");
@@ -9,6 +10,9 @@ const govMenu = document.getElementById("govMenu");
 const govMenuToggle = document.getElementById("govMenuToggle");
 const mobileOrgToggle = document.getElementById("mobileOrgToggle");
 const mobileOrganizations = document.getElementById("mobileOrganizations");
+const themeToggle = document.getElementById("themeToggle");
+const themeToggleLabel = document.getElementById("themeToggleLabel");
+const scrollProgress = document.getElementById("scrollProgress");
 const meetingForm = document.getElementById("meetingForm");
 const applicationForm = document.getElementById("applicationForm");
 const statusForm = document.getElementById("statusForm");
@@ -16,21 +20,32 @@ const statusInput = document.getElementById("statusDeviceIdInput");
 const deviceIdLabel = document.getElementById("deviceIdLabel");
 const copyDeviceIdBtn = document.getElementById("copyDeviceIdBtn");
 const meetingDateInput = document.getElementById("meetingDateInput");
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+const systemThemeQuery =
+  window.matchMedia && typeof window.matchMedia === "function"
+    ? window.matchMedia("(prefers-color-scheme: dark)")
+    : null;
 const defaultFavicon =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f80ff'/%3E%3Ctext x='50%25' y='56%25' font-size='28' text-anchor='middle' fill='white' font-family='Arial'%3EQY%3C/text%3E%3C/svg%3E";
 
 document.addEventListener("DOMContentLoaded", async () => {
+  initializeTheme();
   deviceIdLabel.textContent = state.deviceId;
   statusInput.value = state.deviceId;
   meetingDateInput.min = new Date().toISOString().slice(0, 10);
 
   bindUi();
+  bindWindowEffects();
   await loadSiteContent();
   await lookupApplicationStatus(state.deviceId, false);
   initializeRevealObserver();
 });
 
 function bindUi() {
+  if (themeToggle) {
+    themeToggle.addEventListener("click", toggleTheme);
+  }
+
   if (menuToggle) {
     menuToggle.addEventListener("click", () => {
       mobileMenu.classList.toggle("open");
@@ -73,6 +88,11 @@ function bindUi() {
     event.preventDefault();
     await lookupApplicationStatus(statusInput.value, true);
   });
+}
+
+function bindWindowEffects() {
+  updateScrollProgress();
+  window.addEventListener("scroll", updateScrollProgress, { passive: true });
 }
 
 async function loadSiteContent() {
@@ -289,7 +309,7 @@ function renderSelectOptions(targetId, options) {
   const target = document.getElementById(targetId);
   target.innerHTML = `
     <option value="">Tanlang</option>
-    ${options.map((item) => `<option value="${item}">${item}</option>`).join("")}
+    ${options.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join("")}
   `;
 }
 
@@ -695,6 +715,96 @@ function updateSeoMeta(content) {
       null,
       2
     );
+  }
+}
+
+function initializeTheme() {
+  applyTheme(resolveInitialTheme(), false);
+
+  if (systemThemeQuery) {
+    if (typeof systemThemeQuery.addEventListener === "function") {
+      systemThemeQuery.addEventListener("change", handleSystemThemeChange);
+    } else if (typeof systemThemeQuery.addListener === "function") {
+      systemThemeQuery.addListener(handleSystemThemeChange);
+    }
+  }
+}
+
+function resolveInitialTheme() {
+  const savedTheme = readStoredTheme();
+
+  if (savedTheme === "dark" || savedTheme === "light") {
+    return savedTheme;
+  }
+
+  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+}
+
+function handleSystemThemeChange(event) {
+  const savedTheme = readStoredTheme();
+
+  if (savedTheme === "dark" || savedTheme === "light") {
+    return;
+  }
+
+  applyTheme(event.matches ? "dark" : "light", false);
+}
+
+function toggleTheme() {
+  applyTheme(state.theme === "dark" ? "light" : "dark", true);
+}
+
+function applyTheme(theme, persist) {
+  const nextTheme = theme === "dark" ? "dark" : "light";
+  state.theme = nextTheme;
+  document.documentElement.dataset.theme = nextTheme;
+  updateThemeToggle(nextTheme);
+  updateThemeMeta(nextTheme);
+
+  if (persist) {
+    writeStoredTheme(nextTheme);
+  }
+}
+
+function updateThemeToggle(theme) {
+  if (themeToggle) {
+    themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+  }
+
+  if (themeToggleLabel) {
+    themeToggleLabel.textContent = theme === "dark" ? "Kunduzgi rejim" : "Tungi rejim";
+  }
+}
+
+function updateThemeMeta(theme) {
+  if (themeColorMeta) {
+    themeColorMeta.setAttribute("content", theme === "dark" ? "#07111f" : "#f4f8ff");
+  }
+}
+
+function updateScrollProgress() {
+  if (!scrollProgress) {
+    return;
+  }
+
+  const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
+  scrollProgress.style.transform = `scaleX(${progress})`;
+}
+
+function readStoredTheme() {
+  try {
+    return localStorage.getItem("qyt_theme");
+  } catch (error) {
+    return null;
+  }
+}
+
+function writeStoredTheme(theme) {
+  try {
+    localStorage.setItem("qyt_theme", theme);
+  } catch (error) {
+    // Ignore storage write issues and continue with in-memory theme.
   }
 }
 

@@ -45,6 +45,23 @@
     href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
     rel="stylesheet"
   />
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem("qyt_theme");
+        var prefersDark =
+          window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.dataset.theme =
+          savedTheme === "dark" || savedTheme === "light"
+            ? savedTheme
+            : prefersDark
+              ? "dark"
+              : "light";
+      } catch (error) {
+        document.documentElement.dataset.theme = "light";
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="styles.css" />
   <script type="application/ld+json" id="organizationSchema">
     {
@@ -55,6 +72,7 @@
   </script>
 </head>
 <body>
+  <div class="scroll-progress" id="scrollProgress"></div>
   <div class="ambient ambient-a"></div>
   <div class="ambient ambient-b"></div>
 
@@ -86,6 +104,10 @@
       </nav>
 
       <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Rejimni almashtirish" aria-pressed="false">
+          <span class="theme-toggle-knob"></span>
+          <span class="theme-toggle-label" id="themeToggleLabel">Tungi rejim</span>
+        </button>
         <a class="nav-cta" href="#application">Boshlash</a>
         <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menyuni ochish">
           <span></span>
@@ -127,6 +149,17 @@
             <a class="btn btn-secondary" id="heroSecondaryAction" href="#meeting">Uchrashuv belgilash</a>
           </div>
 
+          <div class="hero-signal-strip">
+            <article class="signal-chip reveal">
+              <span>Rasmiy platforma</span>
+              <strong>Ariza, uchrashuv va status oqimi bitta sahifada</strong>
+            </article>
+            <article class="signal-chip reveal delay-1">
+              <span>Premium tajriba</span>
+              <strong>Kunduzgi va tungi rejim bilan moslashuvchan dizayn</strong>
+            </article>
+          </div>
+
           <div class="hero-spotlights" id="heroSpotlights"></div>
         </div>
 
@@ -137,6 +170,28 @@
               <span class="overlay-pill">Premium Control Hub</span>
               <h2 id="heroCardTitle">Texnopark boshqaruvi va imkoniyatlari bitta platformada</h2>
               <p id="heroCardDescription"></p>
+            </div>
+          </div>
+
+          <div class="hero-status-panel">
+            <div class="hero-status-head">
+              <span>Experience Layer</span>
+              <strong>Responsive premium landing page</strong>
+            </div>
+            <div class="status-track">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="hero-status-meta">
+              <div>
+                <span>Mode</span>
+                <strong>Light / Dark</strong>
+              </div>
+              <div>
+                <span>Media</span>
+                <strong>Cloud-ready</strong>
+              </div>
             </div>
           </div>
 
