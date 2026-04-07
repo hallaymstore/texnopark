@@ -329,6 +329,20 @@ textarea {
   margin-bottom: 22px;
 }
 
+.site-header.scrolled {
+  transform: translateY(-2px);
+  transition: transform 300ms var(--ease-boost), background 300ms var(--ease-boost), box-shadow 300ms var(--ease-boost);
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.86));
+  box-shadow: 0 18px 42px rgba(17, 38, 96, 0.06);
+  border-color: rgba(17, 63, 103, 0.06);
+}
+
+html[data-theme="dark"] .site-header.scrolled {
+  background: linear-gradient(180deg, rgba(6,12,20,0.9), rgba(6,12,20,0.86));
+  box-shadow: 0 18px 48px rgba(0,0,0,0.52);
+  border-color: rgba(255,255,255,0.03);
+}
+
 .site-header-main,
 .site-header-tools {
   display: flex;
@@ -511,6 +525,23 @@ textarea {
   margin: 4px auto;
   border-radius: 999px;
   background: currentColor;
+}
+
+.menu-toggle.is-open span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.menu-toggle.is-open span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.menu-toggle.is-open span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.menu-toggle span {
+  transition: transform 240ms var(--ease-boost), opacity 200ms ease;
 }
 
 .search-shell {
@@ -1348,6 +1379,16 @@ html[data-theme="dark"] .theme-toggle-knob::after {
   line-height: 1.22;
 }
 
+/* Card parallax/pointer effect */
+.project-card,
+.news-card,
+.testimonial-card,
+.partner-card {
+  transform-origin: center center;
+  transition: transform 280ms var(--ease-boost), box-shadow 280ms var(--ease-boost);
+  will-change: transform;
+}
+
 .project-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -1793,6 +1834,44 @@ html[data-theme="dark"] .theme-toggle-knob::after {
     position: static;
     width: 100%;
     margin-top: 14px;
+  }
+}
+
+/* Auto-carousel behavior on small screens for projects/news */
+@media (max-width: 1080px) {
+  .project-grid,
+  .news-grid {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  .project-card,
+  .news-card {
+    flex: 0 0 86%;
+    scroll-snap-align: center;
+    min-width: 86%;
+    max-width: 86%;
+  }
+
+  .project-card.featured {
+    flex: 0 0 92%;
+    min-width: 92%;
+    max-width: 92%;
+  }
+
+  .project-grid::-webkit-scrollbar,
+  .news-grid::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .project-grid::-webkit-scrollbar-thumb,
+  .news-grid::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 999px;
   }
 }
 
@@ -2995,6 +3074,80 @@ html[data-theme="dark"] .chatbot-modal {
     left: 14px;
     bottom: 14px;
   }
+}
+
+/* Lightbox for images (global) */
+.qyt-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+}
+
+.qyt-lightbox.open {
+  display: flex;
+}
+
+.qyt-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 12, 24, 0.7);
+  backdrop-filter: blur(6px) saturate(1.1);
+}
+
+.qyt-lightbox-inner {
+  position: relative;
+  z-index: 2220;
+  display: grid;
+  gap: 12px;
+  align-items: center;
+  justify-items: center;
+  max-width: 1200px;
+  width: min(92vw, 1200px);
+  max-height: 92vh;
+  padding: 18px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02));
+  box-shadow: 0 34px 90px rgba(0,0,0,0.46);
+}
+
+.qyt-lightbox-stage img {
+  width: auto;
+  height: auto;
+  max-width: calc(100% - 40px);
+  max-height: calc(100vh - 160px);
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: var(--shadow-strong);
+  transition: transform 320ms var(--ease-boost), opacity 320ms ease;
+}
+
+.qyt-lightbox-close,
+.qyt-lightbox-prev,
+.qyt-lightbox-next {
+  position: absolute;
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.qyt-lightbox-close { right: 12px; top: 12px; }
+.qyt-lightbox-prev { left: 8px; top: 50%; transform: translateY(-50%); }
+.qyt-lightbox-next { right: 8px; top: 50%; transform: translateY(-50%); }
+
+@media (max-width: 760px) {
+  .qyt-lightbox-inner { padding: 12px; border-radius: 10px; }
+  .qyt-lightbox-close, .qyt-lightbox-prev, .qyt-lightbox-next { min-width: 40px; min-height: 40px; }
 }
 
 /* Premium motion, backdrop & enhanced media effects */

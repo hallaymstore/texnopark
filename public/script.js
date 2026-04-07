@@ -139,6 +139,10 @@ function bindUi() {
       const isOpen = mobileMenu?.classList.toggle("open");
       document.body.classList.toggle("menu-open", Boolean(isOpen));
       if (menuBackdrop) menuBackdrop.classList.toggle("active", Boolean(isOpen));
+      // animate hamburger -> close
+      try {
+        menuToggle.classList.toggle("is-open", Boolean(isOpen));
+      } catch (e) {}
       // Lock scroll while menu is open for a cleaner mobile experience
       document.documentElement.style.overflow = isOpen ? "hidden" : "";
     });
@@ -298,6 +302,95 @@ function initializeImageMotion() {
   }
 }
 
+function initLightbox() {
+  try {
+    if (document.getElementById("qytLightbox")) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.id = "qytLightbox";
+    wrapper.className = "qyt-lightbox";
+    wrapper.innerHTML = `
+      <div class="qyt-lightbox-backdrop" id="qytLightboxBackdrop"></div>
+      <div class="qyt-lightbox-inner" role="dialog" aria-modal="true" aria-hidden="true">
+        <button class="qyt-lightbox-close" id="qytLightboxClose" aria-label="Yopish">×</button>
+        <button class="qyt-lightbox-prev" id="qytLightboxPrev" aria-label="Oldingi">‹</button>
+        <div class="qyt-lightbox-stage" id="qytLightboxStage"><img src="" alt="" /></div>
+        <button class="qyt-lightbox-next" id="qytLightboxNext" aria-label="Keyingi">›</button>
+      </div>
+    `;
+
+    document.body.appendChild(wrapper);
+
+    const backdrop = document.getElementById("qytLightboxBackdrop");
+    const stageImg = wrapper.querySelector(".qyt-lightbox-stage img");
+    const closeBtn = document.getElementById("qytLightboxClose");
+    const prevBtn = document.getElementById("qytLightboxPrev");
+    const nextBtn = document.getElementById("qytLightboxNext");
+
+    let images = [];
+    let current = -1;
+
+    function collectImages() {
+      // gather visually relevant images for lightbox
+      const selector = '.media-frame img, .project-card-image, .hero-card-media img, .testimonial-avatar img, .partner-logo img, .preview-media img';
+      images = Array.from(document.querySelectorAll(selector)).filter((i) => i && i.src);
+    }
+
+    function openAt(index) {
+      if (!images.length) return;
+      current = (index + images.length) % images.length;
+      const src = images[current].src;
+      stageImg.src = src;
+      wrapper.classList.add("open");
+      document.documentElement.style.overflow = "hidden";
+      wrapper.querySelector('.qyt-lightbox-inner').setAttribute('aria-hidden','false');
+    }
+
+    function close() {
+      wrapper.classList.remove("open");
+      document.documentElement.style.overflow = "";
+      wrapper.querySelector('.qyt-lightbox-inner').setAttribute('aria-hidden','true');
+      stageImg.src = "";
+      current = -1;
+    }
+
+    backdrop.addEventListener("click", close);
+    closeBtn.addEventListener("click", close);
+
+    prevBtn.addEventListener("click", () => {
+      if (images.length) openAt((current - 1 + images.length) % images.length);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (images.length) openAt((current + 1) % images.length);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!wrapper.classList.contains("open")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") openAt((current - 1 + images.length) % images.length);
+      if (e.key === "ArrowRight") openAt((current + 1) % images.length);
+    });
+
+    // delegate clicks to relevant images
+    document.body.addEventListener("click", (event) => {
+      const img = event.target.closest('img');
+      if (!img) return;
+      // only open for inside media regions we rendered
+      if (!img.closest('.media-frame, .project-card, .hero-card, .testimonial-card, .partner-card, .preview-media')) return;
+      collectImages();
+      const idx = images.findIndex((i) => i === img);
+      if (idx >= 0) {
+        openAt(idx);
+        event.preventDefault();
+      }
+    });
+  } catch (error) {
+    // silent fail — lightbox is progressive enhancement
+    console.warn('Lightbox init failed', error);
+  }
+}
+
 function bindWindowEffects() {
   updateScrollProgress();
   window.addEventListener("scroll", updateScrollProgress, { passive: true });
@@ -306,6 +399,90 @@ function bindWindowEffects() {
   initializeSectionObserver();
   // initialize visual motion on media elements
   initializeImageMotion();
+  // initialize global lightbox for images
+  initLightbox();
+  bindHeaderScroll();
+  initializeAutoCarousels();
+  bindCardParallax();
+}
+
+function bindCardParallax() {
+  if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
+
+  const selectors = '.project-card, .news-card, .testimonial-card, .partner-card';
+  document.querySelectorAll(selectors).forEach((card) => {
+    if (card.dataset.parallax === 'true') return;
+    card.dataset.parallax = 'true';
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5; // -0.5..0.5
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      const rotateX = (py * 6).toFixed(2);
+      const rotateY = (px * -8).toFixed(2);
+      card.style.transform = `perspective(900px) translateZ(0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      card.style.boxShadow = '0 28px 64px rgba(17, 38, 96, 0.12)';
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.boxShadow = '';
+    });
+  });
+}
+
+function initializeAutoCarousels() {
+  try {
+    if (typeof window.__qytCarousels !== 'undefined') return;
+    window.__qytCarousels = [];
+
+    const startCarousel = (container) => {
+      if (!container) return;
+      let paused = false;
+      const step = Math.max(8, Math.floor(container.clientWidth / 20));
+      const tick = () => {
+        if (paused) return;
+        if (container.scrollWidth <= container.clientWidth) return;
+        container.scrollBy({ left: step, behavior: 'smooth' });
+        if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 6) {
+          // loop back to start
+          setTimeout(() => {
+            container.scrollTo({ left: 0, behavior: 'smooth' });
+          }, 600);
+        }
+      };
+
+      const id = setInterval(tick, 2600);
+      window.__qytCarousels.push({ id, container });
+
+      container.addEventListener('mouseenter', () => (paused = true));
+      container.addEventListener('mouseleave', () => (paused = false));
+      window.addEventListener('resize', () => {
+        // nothing heavy here; keep carousel responsive
+      });
+    };
+
+    // initialize for project and news grids (mobile-friendly auto-scroll)
+    const selectors = ['.project-grid', '.news-grid'];
+    selectors.forEach((sel) => {
+      document.querySelectorAll(sel).forEach((el) => startCarousel(el));
+    });
+  } catch (e) {
+    // ignore carousel initialization errors
+  }
+}
+
+function bindHeaderScroll() {
+  const header = document.querySelector('.site-header');
+
+  if (!header) return;
+
+  const onScroll = () => {
+    header.classList.toggle('scrolled', window.scrollY > 20);
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 }
 
 async function loadSiteContent() {
