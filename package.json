@@ -6,7 +6,11 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "build:static": "node scripts/build-static.js",
+    "check:worker": "node --check cloudflare/worker.mjs",
+    "cf:dev": "npm run build:static && wrangler dev",
+    "cf:deploy": "npm run build:static && wrangler deploy"
   },
   "dependencies": {
     "cloudinary": "^2.5.1",
@@ -15,5 +19,8 @@
     "express": "^4.21.2",
     "mongoose": "^8.18.0",
     "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.13.2"
   }
 }

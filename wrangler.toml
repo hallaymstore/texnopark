@@ -1,0 +1,18 @@
+name = "qarshi-texnopark"
+main = "cloudflare/worker.mjs"
+compatibility_date = "2026-04-06"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[vars]
+GROQ_MODEL = "llama-3.3-70b-versatile"
+ADMIN_SLUG = "ef3190c0fee63c12"
+CLOUDINARY_FOLDER = "qarshi-texnopark"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "qarshi-texnopark"
+database_id = "00000000-0000-0000-0000-000000000000"
+preview_database_id = "00000000-0000-0000-0000-000000000000"

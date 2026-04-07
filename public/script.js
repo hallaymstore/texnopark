@@ -13,6 +13,7 @@ const state = {
 const pageLoader = document.getElementById("pageLoader");
 const menuToggle = document.getElementById("menuToggle");
 const mobileMenu = document.getElementById("mobileMenu");
+const menuBackdrop = document.getElementById("menuBackdrop");
 const govMenu = document.getElementById("govMenu");
 const govMenuToggle = document.getElementById("govMenuToggle");
 const mobileOrgToggle = document.getElementById("mobileOrgToggle");
@@ -54,15 +55,40 @@ const systemThemeQuery =
 const defaultFavicon =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f80ff'/%3E%3Ctext x='50%25' y='56%25' font-size='28' text-anchor='middle' fill='white' font-family='Arial'%3EQY%3C/text%3E%3C/svg%3E";
 const CHAT_STORAGE_KEY = "qyt_chat_messages";
+const SECTION_ROUTE_MAP = Object.freeze({
+  home: "/#home",
+  about: "/about.html#about",
+  timeline: "/about.html#timeline",
+  directions: "/programs.html#directions",
+  projects: "/programs.html#projects",
+  news: "/faq.html#news",
+  testimonials: "/about.html#testimonials",
+  meeting: "/contact.html#meeting",
+  application: "/contact.html#application",
+  status: "/contact.html#status",
+  partners: "/programs.html#partners",
+  contact: "/contact.html#contact",
+  faq: "/faq.html#faq"
+});
 
 window.addEventListener("message", handlePreviewMessage);
 
 document.addEventListener("DOMContentLoaded", async () => {
   initializeTheme();
+  initializeActiveRouteLinks();
   initializeChatWidget();
-  deviceIdLabel.textContent = state.deviceId;
-  statusInput.value = state.deviceId;
-  meetingDateInput.min = new Date().toISOString().slice(0, 10);
+
+  if (deviceIdLabel) {
+    deviceIdLabel.textContent = state.deviceId;
+  }
+
+  if (statusInput) {
+    statusInput.value = state.deviceId;
+  }
+
+  if (meetingDateInput) {
+    meetingDateInput.min = new Date().toISOString().slice(0, 10);
+  }
 
   bindUi();
   bindWindowEffects();
@@ -110,8 +136,21 @@ function bindUi() {
 
   if (menuToggle) {
     menuToggle.addEventListener("click", () => {
-      mobileMenu.classList.toggle("open");
+      const isOpen = mobileMenu?.classList.toggle("open");
+      document.body.classList.toggle("menu-open", Boolean(isOpen));
+      if (menuBackdrop) menuBackdrop.classList.toggle("active", Boolean(isOpen));
+      // Lock scroll while menu is open for a cleaner mobile experience
+      document.documentElement.style.overflow = isOpen ? "hidden" : "";
     });
+
+    if (menuBackdrop) {
+      menuBackdrop.addEventListener("click", () => {
+        mobileMenu?.classList.remove("open");
+        document.body.classList.remove("menu-open");
+        menuBackdrop.classList.remove("active");
+        document.documentElement.style.overflow = "";
+      });
+    }
   }
 
   if (govMenuToggle) {
@@ -128,7 +167,7 @@ function bindUi() {
 
   if (mobileOrgToggle) {
     mobileOrgToggle.addEventListener("click", () => {
-      mobileOrganizations.classList.toggle("open");
+      mobileOrganizations?.classList.toggle("open");
     });
   }
 
@@ -187,24 +226,76 @@ function bindUi() {
     }
   });
 
-  mobileMenu.addEventListener("click", (event) => {
-    if (event.target.closest("a")) {
-      mobileMenu.classList.remove("open");
-      mobileOrganizations.classList.remove("open");
-    }
-  });
+  if (mobileMenu) {
+    mobileMenu.addEventListener("click", (event) => {
+      if (event.target.closest("a")) {
+        mobileMenu.classList.remove("open");
+        mobileOrganizations?.classList.remove("open");
+      }
+    });
+  }
 
-  copyDeviceIdBtn.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(state.deviceId);
-    showMessage("applicationMessage", "Device ID nusxa olindi.");
-  });
+  if (copyDeviceIdBtn) {
+    copyDeviceIdBtn.addEventListener("click", async () => {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(state.deviceId);
+        showMessage("applicationMessage", "Device ID nusxa olindi.");
+        return;
+      }
 
-  meetingForm.addEventListener("submit", handleMeetingSubmit);
-  applicationForm.addEventListener("submit", handleApplicationSubmit);
-  statusForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    await lookupApplicationStatus(statusInput.value, true);
-  });
+      showMessage("applicationMessage", "Brauzer nusxa olishni qo'llamadi.");
+    });
+  }
+
+  if (meetingForm) {
+    meetingForm.addEventListener("submit", handleMeetingSubmit);
+  }
+
+  if (applicationForm) {
+    applicationForm.addEventListener("submit", handleApplicationSubmit);
+  }
+
+  if (statusForm) {
+    statusForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await lookupApplicationStatus(statusInput ? statusInput.value : "", true);
+    });
+  }
+}
+
+function initializeImageMotion() {
+  // Apply gentle floating animation to media elements
+  document
+    .querySelectorAll('.hero-card-media img, .project-card-image, .testimonial-avatar img, .partner-logo img')
+    .forEach((el, i) => {
+      try {
+        if (el.dataset.motionBound === 'true') return;
+        el.dataset.motionBound = 'true';
+        const delay = Math.floor(Math.random() * 8000);
+        el.style.animation = `floatRotate 10s ease-in-out ${delay}ms infinite both`;
+        el.style.willChange = 'transform';
+      } catch (e) {
+        // ignore
+      }
+    });
+
+  // Small parallax on the hero image
+  const hero = document.querySelector('.hero-card');
+  const heroImg = hero ? hero.querySelector('img') : null;
+
+  if (hero && heroImg && !hero.dataset.parallaxBound) {
+    hero.dataset.parallaxBound = 'true';
+    hero.addEventListener('mousemove', (e) => {
+      const rect = hero.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 .. 0.5
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      heroImg.style.transform = `translate3d(${x * 18}px, ${y * 18}px, 0) rotate(${x * 2}deg) scale(1.02)`;
+    });
+
+    hero.addEventListener('mouseleave', () => {
+      heroImg.style.transform = '';
+    });
+  }
 }
 
 function bindWindowEffects() {
@@ -213,6 +304,8 @@ function bindWindowEffects() {
   bindInteractiveGlow();
   bindMagneticButtons();
   initializeSectionObserver();
+  // initialize visual motion on media elements
+  initializeImageMotion();
 }
 
 async function loadSiteContent() {
@@ -234,7 +327,10 @@ async function loadSiteContent() {
 }
 
 function renderContent(content) {
-  document.title = content.general.seoTitle || content.general.organizationName;
+  const pageTitle = String(document.body?.dataset?.pageTitle || "").trim();
+  document.title = pageTitle
+    ? `${pageTitle} | ${content.general.organizationName}`
+    : content.general.seoTitle || content.general.organizationName;
   const metaDescription = document.querySelector('meta[name="description"]');
   const metaKeywords = document.querySelector('meta[name="keywords"]');
 
@@ -360,6 +456,8 @@ function renderContent(content) {
 
   bindInteractiveGlow();
   initializeRevealObserver();
+  // ensure media motion is set up after DOM updates
+  initializeImageMotion();
   hidePageLoader();
 }
 
@@ -560,16 +658,19 @@ function hydrateSearch(content) {
     {
       label: "Asosiy",
       id: "home",
+      href: resolveSectionHref("home"),
       text: [content.hero.title, content.hero.highlight, content.hero.description].join(" ")
     },
     {
       label: "Markaz haqida",
       id: "about",
+      href: resolveSectionHref("about"),
       text: [content.about.title, content.about.description, ...(content.about.features || [])].join(" ")
     },
     {
       label: "Qabul bosqichlari",
       id: "timeline",
+      href: resolveSectionHref("timeline"),
       text: [
         content.timelineSection?.title,
         content.timelineSection?.description,
@@ -579,6 +680,7 @@ function hydrateSearch(content) {
     {
       label: "Yo'nalishlar",
       id: "directions",
+      href: resolveSectionHref("directions"),
       text: [
         content.directions.title,
         content.directions.description,
@@ -588,6 +690,7 @@ function hydrateSearch(content) {
     {
       label: "Loyihalar",
       id: "projects",
+      href: resolveSectionHref("projects"),
       text: [
         content.projects.title,
         content.projects.description,
@@ -597,6 +700,7 @@ function hydrateSearch(content) {
     {
       label: "Yangiliklar",
       id: "news",
+      href: resolveSectionHref("news"),
       text: [
         content.news.title,
         content.news.description,
@@ -606,6 +710,7 @@ function hydrateSearch(content) {
     {
       label: "Muvaffaqiyat hikoyalari",
       id: "testimonials",
+      href: resolveSectionHref("testimonials"),
       text: [
         content.testimonialsSection?.title,
         content.testimonialsSection?.description,
@@ -615,21 +720,25 @@ function hydrateSearch(content) {
     {
       label: "Uchrashuv",
       id: "meeting",
+      href: resolveSectionHref("meeting"),
       text: [content.appointmentSection.title, content.appointmentSection.description, content.appointmentSection.note].join(" ")
     },
     {
       label: "Ariza",
       id: "application",
+      href: resolveSectionHref("application"),
       text: [content.applicationSection.title, content.applicationSection.description, content.applicationSection.helperText].join(" ")
     },
     {
       label: "Natijalar",
       id: "status",
+      href: resolveSectionHref("status"),
       text: [content.statusSection.title, content.statusSection.description, content.statusSection.helperText].join(" ")
     },
     {
       label: "Hamkorlar",
       id: "partners",
+      href: resolveSectionHref("partners"),
       text: [
         content.partnersSection?.title,
         content.partnersSection?.description,
@@ -639,6 +748,7 @@ function hydrateSearch(content) {
     {
       label: "Bog'lanish",
       id: "contact",
+      href: resolveSectionHref("contact"),
       text: [content.contact.title, content.contact.description, content.contact.address].join(" ")
     }
   ];
@@ -654,6 +764,11 @@ function hydrateSearch(content) {
 
 function renderHeroSpotlights(items) {
   const target = document.getElementById("heroSpotlights");
+
+  if (!target) {
+    return;
+  }
+
   target.innerHTML = items
     .map((item) => {
       const parsed = splitValue(item.value);
@@ -671,11 +786,21 @@ function renderHeroSpotlights(items) {
 
 function renderSimpleList(targetId, items) {
   const target = document.getElementById(targetId);
+
+  if (!target) {
+    return;
+  }
+
   target.innerHTML = items.map((item) => `<div class="reveal">${escapeHtml(item)}</div>`).join("");
 }
 
 function renderFeatureList(items) {
   const target = document.getElementById("aboutFeatures");
+
+  if (!target) {
+    return;
+  }
+
   target.innerHTML = items
     .map((item) => `<div class="feature-item reveal">${escapeHtml(item)}</div>`)
     .join("");
@@ -727,6 +852,10 @@ function renderProgramFilters(items) {
 
 function renderDirections(items) {
   const target = document.getElementById("directionsGrid");
+
+  if (!target) {
+    return;
+  }
 
   const filteredItems =
     state.directionFilter === "all"
@@ -1138,6 +1267,11 @@ async function sendChatMessage(rawMessage) {
 
 function renderProjects(items) {
   const target = document.getElementById("projectsGrid");
+
+  if (!target) {
+    return;
+  }
+
   target.innerHTML = items
     .map(
       (item) => `
@@ -1156,6 +1290,11 @@ function renderProjects(items) {
 
 function renderMetrics(items) {
   const target = document.getElementById("metricsGrid");
+
+  if (!target) {
+    return;
+  }
+
   target.innerHTML = items
     .map((item) => {
       const parsed = splitValue(item.value);
@@ -1173,6 +1312,11 @@ function renderMetrics(items) {
 
 function renderNews(items) {
   const target = document.getElementById("newsGrid");
+
+  if (!target) {
+    return;
+  }
+
   target.innerHTML = items
     .map(
       (item) => `
@@ -1180,7 +1324,7 @@ function renderNews(items) {
           <span class="news-meta">${escapeHtml(item.date)}</span>
           <h3>${escapeHtml(item.title)}</h3>
           <p>${escapeHtml(item.description)}</p>
-          <a href="${sanitizeHref(item.link, { allowHash: true, allowRelative: true })}">Batafsil</a>
+          <a href="${sanitizeHref(resolveSiteHref(item.link), { allowHash: true, allowRelative: true })}">Batafsil</a>
         </article>
       `
     )
@@ -1189,6 +1333,11 @@ function renderNews(items) {
 
 function renderSelectOptions(targetId, options) {
   const target = document.getElementById(targetId);
+
+  if (!target) {
+    return;
+  }
+
   target.innerHTML = `
     <option value="">Tanlang</option>
     ${options.map((item) => `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`).join("")}
@@ -1198,6 +1347,10 @@ function renderSelectOptions(targetId, options) {
 async function handleMeetingSubmit(event) {
   event.preventDefault();
   showMessage("meetingMessage", "Yuborilmoqda...");
+
+  if (!meetingForm) {
+    return;
+  }
 
   const formData = new FormData(meetingForm);
   const payload = Object.fromEntries(formData.entries());
@@ -1219,7 +1372,9 @@ async function handleMeetingSubmit(event) {
     }
 
     meetingForm.reset();
-    meetingDateInput.min = new Date().toISOString().slice(0, 10);
+    if (meetingDateInput) {
+      meetingDateInput.min = new Date().toISOString().slice(0, 10);
+    }
     showMessage(
       "meetingMessage",
       `${result.message} Tracking code: ${result.data.trackingCode}`
@@ -1232,6 +1387,10 @@ async function handleMeetingSubmit(event) {
 async function handleApplicationSubmit(event) {
   event.preventDefault();
   showMessage("applicationMessage", "Ariza yuborilmoqda...");
+
+  if (!applicationForm) {
+    return;
+  }
 
   const formData = new FormData(applicationForm);
   const payload = Object.fromEntries(formData.entries());
@@ -1266,6 +1425,10 @@ async function handleApplicationSubmit(event) {
 async function lookupApplicationStatus(deviceId, fromManualSubmit) {
   const normalized = String(deviceId || "").trim();
   const target = document.getElementById("statusList");
+
+  if (!target) {
+    return;
+  }
 
   if (!normalized) {
     target.innerHTML = `<div class="status-empty"><p>Device ID kiriting.</p></div>`;
@@ -1501,8 +1664,15 @@ function setText(id, value) {
 }
 
 function setActiveNav(hash) {
+  const normalizedTarget = normalizeInternalHref(hash || window.location.href);
+  const targetPath = normalizedTarget.split("#")[0];
+
   sidebarLinks.forEach((link) => {
-    link.classList.toggle("is-active", link.getAttribute("href") === hash);
+    const normalizedLink = normalizeInternalHref(link.getAttribute("href") || "");
+    link.classList.toggle(
+      "is-active",
+      normalizedLink === normalizedTarget || normalizedLink.split("#")[0] === targetPath
+    );
   });
 }
 
@@ -1518,7 +1688,7 @@ function setLink(id, href, text) {
   }
 
   if (href) {
-    element.href = sanitizeHref(href, { allowHash: true, allowRelative: true });
+    element.href = sanitizeHref(resolveSiteHref(href), { allowHash: true, allowRelative: true });
   }
 
   if (text) {
@@ -1645,10 +1815,11 @@ function updateFavicon(logoUrl) {
 
 function updateSeoMeta(content) {
   const image = sanitizeMediaUrl(content.general.logo || content.hero.image) || "";
+  const canonicalHref = window.location.href.split("#")[0];
   updateMetaBySelector('meta[property="og:title"]', content.general.seoTitle || content.general.organizationName);
   updateMetaBySelector('meta[property="og:site_name"]', content.general.organizationName);
   updateMetaBySelector('meta[property="og:description"]', content.general.metaDescription);
-  updateMetaBySelector('meta[property="og:url"]', window.location.origin);
+  updateMetaBySelector('meta[property="og:url"]', canonicalHref);
   updateMetaBySelector('meta[property="og:image"]', image);
   updateMetaBySelector('meta[name="twitter:title"]', content.general.seoTitle || content.general.organizationName);
   updateMetaBySelector('meta[name="twitter:description"]', content.general.metaDescription);
@@ -1656,7 +1827,7 @@ function updateSeoMeta(content) {
   const canonicalUrl = document.getElementById("canonicalUrl");
 
   if (canonicalUrl) {
-    canonicalUrl.href = window.location.origin;
+    canonicalUrl.href = canonicalHref;
   }
 
   const schemaNode = document.getElementById("organizationSchema");
@@ -1785,15 +1956,18 @@ function handleQuickSearch(event) {
     return;
   }
 
-  const target = document.getElementById(match.id);
+  const destination = resolveSiteHref(match.href || `#${match.id}`);
+  const targetHash = extractHash(destination);
+  const samePage = isSamePageHref(destination);
+  const target = samePage && targetHash ? document.querySelector(targetHash) : null;
 
-  if (!target) {
-    showMessage("searchFeedback", "Topilgan bo'lim ochilmadi.");
+  if (!samePage || !target) {
+    window.location.href = destination;
     return;
   }
 
   target.scrollIntoView({ behavior: "smooth", block: "start" });
-  setActiveNav(`#${match.id}`);
+  setActiveNav(destination);
   showMessage("searchFeedback", `${match.label} bo'limiga o'tildi.`);
 }
 
@@ -1825,6 +1999,89 @@ function readStoredTheme() {
     return localStorage.getItem("qyt_theme");
   } catch (error) {
     return null;
+  }
+}
+
+function initializeActiveRouteLinks() {
+  const currentHash = window.location.hash;
+
+  if (currentHash) {
+    setActiveNav(currentHash);
+    return;
+  }
+
+  const currentPath = normalizePathname(window.location.pathname);
+  const routeLink =
+    sidebarLinks.find((link) => normalizePathname(new URL(link.href, window.location.origin).pathname) === currentPath) ||
+    sidebarLinks.find((link) => normalizePathname(new URL(link.href, window.location.origin).pathname) === "/");
+
+  if (routeLink) {
+    setActiveNav(routeLink.getAttribute("href") || window.location.href);
+  }
+}
+
+function resolveSectionHref(sectionId) {
+  const mapped = SECTION_ROUTE_MAP[sectionId];
+
+  if (!mapped) {
+    return `#${sectionId}`;
+  }
+
+  const resolved = new URL(mapped, window.location.origin);
+  const targetPath = normalizePathname(resolved.pathname);
+  const currentPath = normalizePathname(window.location.pathname);
+
+  return currentPath === targetPath ? resolved.hash || targetPath : `${targetPath}${resolved.hash}`;
+}
+
+function resolveSiteHref(value) {
+  const input = String(value || "").trim();
+
+  if (!input) {
+    return "#";
+  }
+
+  if (!input.startsWith("#")) {
+    return input;
+  }
+
+  return resolveSectionHref(input.slice(1));
+}
+
+function normalizePathname(pathname) {
+  const normalized = String(pathname || "/").trim();
+
+  if (!normalized || normalized === "index.html" || normalized === "/index.html") {
+    return "/";
+  }
+
+  return normalized.startsWith("/") ? normalized : `/${normalized}`;
+}
+
+function normalizeInternalHref(value) {
+  try {
+    const resolved = new URL(resolveSiteHref(value), window.location.origin);
+    return `${normalizePathname(resolved.pathname)}${resolved.hash}`;
+  } catch (error) {
+    return `${normalizePathname(window.location.pathname)}${String(value || "")}`;
+  }
+}
+
+function isSamePageHref(value) {
+  try {
+    const resolved = new URL(resolveSiteHref(value), window.location.origin);
+    return normalizePathname(resolved.pathname) === normalizePathname(window.location.pathname);
+  } catch (error) {
+    return false;
+  }
+}
+
+function extractHash(value) {
+  try {
+    const resolved = new URL(resolveSiteHref(value), window.location.origin);
+    return resolved.hash;
+  } catch (error) {
+    return "";
   }
 }
 

@@ -1,0 +1,10 @@
+SESSION_SECRET=replace-with-a-long-random-secret
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=replace-with-strong-password
+GROQ_API_KEY=replace-with-groq-key
+GROQ_MODEL=llama-3.3-70b-versatile
+ADMIN_SLUG=replace-with-secret-admin-slug
+CLOUDINARY_CLOUD_NAME=replace-with-cloud-name
+CLOUDINARY_API_KEY=replace-with-api-key
+CLOUDINARY_API_SECRET=replace-with-api-secret
+CLOUDINARY_FOLDER=qarshi-texnopark
